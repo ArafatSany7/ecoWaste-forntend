@@ -4,19 +4,18 @@ import { MaxWidthWrapper } from "@/components/layout/MaxWidthWrapper";
 
 const FOOTER_LINKS = {
   Product: [
-    { name: "Features", href: "#features" },
-    { name: "How it works", href: "#how-it-works" },
-    { name: "Pricing", href: "#pricing" },
+    { name: "Features", href: "/#features" },
+    { name: "How it works", href: "/#how-it-works" },
   ],
   Company: [
-    { name: "About", href: "#about" },
-    { name: "Sustainability", href: "#sustainability" },
-    { name: "Careers", href: "#careers" },
+    { name: "About", href: "/about" },
+    { name: "Sustainability", href: "/sustainability" },
+    { name: "Contact", href: "/contact" },
   ],
   Legal: [
-    { name: "Privacy Policy", href: "#privacy" },
-    { name: "Terms of Service", href: "#terms" },
-    { name: "Cookie Policy", href: "#cookies" },
+    { name: "Privacy Policy", href: "/privacy" },
+    { name: "Terms of Service", href: "/terms" },
+    { name: "Cookie Policy", href: "/cookies" },
   ],
 };
 
