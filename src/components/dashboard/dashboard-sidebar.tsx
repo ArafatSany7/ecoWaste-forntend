@@ -12,7 +12,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { Leaf, LayoutDashboard, Truck, Settings } from "lucide-react";
+import { Leaf, LayoutDashboard, Truck, Settings, CreditCard } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -24,6 +24,7 @@ const sidebarRoutes = {
       items: [
         { title: "Overview", url: "/dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
         { title: "My Requests", url: "/dashboard/requests", icon: <Truck className="h-4 w-4" /> },
+        { title: "Billing & Payments", url: "/dashboard/billing", icon: <CreditCard className="h-4 w-4" /> },
         { title: "Settings", url: "/dashboard/settings", icon: <Settings className="h-4 w-4" /> },
       ],
     }
