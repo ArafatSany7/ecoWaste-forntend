@@ -12,8 +12,9 @@ export function AuthGuard({ children }: { children: ReactNode }) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-
-    setIsMounted(true);
+    requestAnimationFrame(() => {
+      setIsMounted(true);
+    });
   }, []);
 
   useEffect(() => {

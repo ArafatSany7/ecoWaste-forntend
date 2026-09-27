@@ -15,8 +15,9 @@ export function RoleGuard({ children, allowedRoles }: RoleGuardProps) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-
-    setIsMounted(true);
+    requestAnimationFrame(() => {
+      setIsMounted(true);
+    });
   }, []);
 
   if (!isMounted) {

@@ -1,7 +1,22 @@
 import { apiClient } from "./client";
 
+export interface WasteRequestPayload {
+  title: string;
+  description: string;
+  wasteType: "PLASTIC" | "ORGANIC" | "E_WASTE" | "PAPER" | "METAL" | "OTHER";
+  estimatedWeight?: string;
+  address: string;
+  contactNumber: string;
+}
+
+export interface WasteRequestResponse {
+  success: boolean;
+  message: string;
+  data: unknown;
+}
+
 export const wasteRequestApi = {
-  create: async (data: Record<string, unknown>) => {
+  create: async (data: WasteRequestPayload): Promise<WasteRequestResponse> => {
     return apiClient.post("/waste-requests", data);
   },
   
