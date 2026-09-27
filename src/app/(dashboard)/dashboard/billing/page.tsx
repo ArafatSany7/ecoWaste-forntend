@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/role-guard";
-import { CreditCard, Receipt, ExternalLink, Loader2 } from "lucide-react";
+import { CreditCard, Receipt, Loader2 } from "lucide-react";
 
 // Mock data 
 const mockInvoices = [
@@ -22,7 +22,7 @@ export default function BillingPage() {
   const initiatePaymentMutation = useMutation({
     mutationFn: (invoiceId: string) => paymentApi.initiatePayment(invoiceId),
     onSuccess: (data) => {
-      const url = data.data?.paymentUrl || data.data?.bkashURL;
+      const url = data.data?.paymentUrl;
       if (url) {
         toast.success("Redirecting to payment gateway...");
         window.location.href = url;
