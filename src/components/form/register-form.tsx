@@ -13,6 +13,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import GoogleLogin from "@/components/modules/google-login/GoogleLogin";
 
 const registerSchema = z.object({
   firstName: z.string().min(2, "First name is too short"),
@@ -152,6 +153,19 @@ export function RegisterForm() {
           Register
         </Button>
       </form>
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-card px-2 text-muted-foreground">
+            Or continue with
+          </span>
+        </div>
+      </div>
+
+      <GoogleLogin />
       
       <div className="text-center text-sm">
         Already have an account?{" "}

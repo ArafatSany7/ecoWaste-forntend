@@ -5,6 +5,8 @@ import { ThemeProvider } from "@/providers/ThemeProvider";
 import QueryProvider from "@/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 
+import { GoogleAuthProvider } from "@/providers/GoogleAuthProvider";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -30,8 +32,10 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <QueryProvider>
-            {children}
-            <Toaster position="top-center" richColors />
+            <GoogleAuthProvider>
+              {children}
+              <Toaster position="top-center" richColors />
+            </GoogleAuthProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>
