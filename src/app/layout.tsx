@@ -4,7 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import QueryProvider from "@/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
-
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { GoogleAuthProvider } from "@/providers/GoogleAuthProvider";
 
 const geistSans = Geist({
@@ -33,8 +33,10 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <QueryProvider>
             <GoogleAuthProvider>
-              {children}
-              <Toaster position="top-center" richColors />
+              <TooltipProvider>
+                {children}
+                <Toaster position="top-center" richColors />
+              </TooltipProvider>
             </GoogleAuthProvider>
           </QueryProvider>
         </ThemeProvider>
