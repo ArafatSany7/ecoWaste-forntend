@@ -23,6 +23,10 @@ export const wasteRequestApi = {
   getAll: async (params?: Record<string, unknown>) => {
     return apiClient.get("/waste-requests", { params });
   },
+
+  getMyRequests: async (params?: Record<string, unknown>) => {
+    return apiClient.get("/waste-requests/my-requests", { params });
+  },
   
   getById: async (id: string) => {
     return apiClient.get(`/waste-requests/${id}`);

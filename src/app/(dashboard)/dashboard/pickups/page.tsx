@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { wasteRequestApi } from "@/api/waste-request.api";
+import { collectorApi } from "@/api/collector.api";
 import { Clock, MapPin, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,7 +15,7 @@ export default function PickupsPage() {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["waste-requests", "assigned"],
-    queryFn: () => wasteRequestApi.getAll(),
+    queryFn: () => collectorApi.getMyJobs(),
   });
 
   const updateStatusMutation = useMutation({

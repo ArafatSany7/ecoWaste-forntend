@@ -15,7 +15,7 @@ export default function RequestsPage() {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["waste-requests"],
-    queryFn: () => wasteRequestApi.getAll(),
+    queryFn: () => wasteRequestApi.getMyRequests(),
   });
 
   const requests = data?.data?.data || [];

@@ -11,5 +11,13 @@ export const adminApi = {
 
   updateUserStatus: async (id: string, status: string) => {
     return apiClient.patch(`/users/${id}/status`, { status });
+  },
+
+  getDashboardAnalytics: async () => {
+    return apiClient.get(`/analytics/admin-dashboard`);
+  },
+
+  getAuditLogs: async (params?: Record<string, unknown>) => {
+    return apiClient.get(`/audit-logs`, { params });
   }
 };

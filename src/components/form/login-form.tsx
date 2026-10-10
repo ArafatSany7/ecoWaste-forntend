@@ -39,26 +39,6 @@ export function LoginForm() {
     try {
       setIsLoading(true);
 
-
-      if (data.email === "admin@example.com") {
-        login({ accessToken: "mock-token", user: { id: "1", email: data.email, role: "ADMIN", name: "Demo Admin" } });
-        toast.success("Demo Admin login successful!");
-        router.push("/dashboard");
-        return;
-      }
-      if (data.email === "citizen@example.com") {
-        login({ accessToken: "mock-token", user: { id: "2", email: data.email, role: "CITIZEN", name: "Demo Citizen" } });
-        toast.success("Demo Citizen login successful!");
-        router.push("/dashboard");
-        return;
-      }
-      if (data.email === "collector@example.com") {
-        login({ accessToken: "mock-token", user: { id: "3", email: data.email, role: "COLLECTOR", name: "Demo Collector" } });
-        toast.success("Demo Collector login successful!");
-        router.push("/dashboard");
-        return;
-      }
-
       const res = await authApi.login(data);
       if (res.success) {
         toast.success(res.message || "Login successful!");
