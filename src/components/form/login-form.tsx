@@ -39,7 +39,7 @@ export function LoginForm() {
     try {
       setIsLoading(true);
 
-      // Handle demo logins without hitting the API
+
       if (data.email === "admin@example.com") {
         login({ accessToken: "mock-token", user: { id: "1", email: data.email, role: "ADMIN", name: "Demo Admin" } });
         toast.success("Demo Admin login successful!");
@@ -63,10 +63,10 @@ export function LoginForm() {
       if (res.success) {
         toast.success(res.message || "Login successful!");
         login(res.data);
-        router.push("/dashboard"); // Later routing logic might adapt to user role
+        router.push("/dashboard");
       }
     } catch (error) {
-      const err = error as { message?: string, errors?: Array<{message: string}> };
+      const err = error as { message?: string, errors?: Array<{ message: string }> };
       const apiErrors = err.errors?.map(e => e.message).join(", ");
       toast.error(apiErrors || err.message || "Invalid credentials.");
     } finally {
@@ -82,15 +82,15 @@ export function LoginForm() {
           Enter your email and password to access your account
         </p>
       </div>
-      
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
-          <Input 
-            id="email" 
-            type="email" 
-            placeholder="jane@example.com" 
-            {...register("email")} 
+          <Input
+            id="email"
+            type="email"
+            placeholder="jane@example.com"
+            {...register("email")}
             disabled={isLoading}
           />
           {errors.email && (
@@ -105,10 +105,10 @@ export function LoginForm() {
               Forgot password?
             </Link>
           </div>
-          <Input 
-            id="password" 
-            type="password" 
-            {...register("password")} 
+          <Input
+            id="password"
+            type="password"
+            {...register("password")}
             disabled={isLoading}
           />
           {errors.password && (
@@ -147,27 +147,27 @@ export function LoginForm() {
       </div>
 
       <div className="grid grid-cols-3 gap-2">
-        <Button 
-          variant="outline" 
-          type="button" 
+        <Button
+          variant="outline"
+          type="button"
           className="text-xs"
           onClick={() => onSubmit({ email: "admin@example.com", password: "password123" })}
           disabled={isLoading}
         >
           Admin
         </Button>
-        <Button 
-          variant="outline" 
-          type="button" 
+        <Button
+          variant="outline"
+          type="button"
           className="text-xs"
           onClick={() => onSubmit({ email: "citizen@example.com", password: "password123" })}
           disabled={isLoading}
         >
           Citizen
         </Button>
-        <Button 
-          variant="outline" 
-          type="button" 
+        <Button
+          variant="outline"
+          type="button"
           className="text-xs"
           onClick={() => onSubmit({ email: "collector@example.com", password: "password123" })}
           disabled={isLoading}
@@ -175,7 +175,7 @@ export function LoginForm() {
           Collector
         </Button>
       </div>
-      
+
       <div className="text-center text-sm">
         Don&apos;t have an account?{" "}
         <Link href="/register" className="underline hover:text-primary transition-colors">
