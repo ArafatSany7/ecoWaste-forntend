@@ -18,7 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 export default function AdminCategoriesPage() {
   const queryClient = useQueryClient();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: "", description: "", basePrice: 0 });
+  const [formData, setFormData] = useState({ name: "", description: "", type: "" });
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["admin-categories"],
@@ -31,7 +31,7 @@ export default function AdminCategoriesPage() {
       toast.success("Category created successfully");
       queryClient.invalidateQueries({ queryKey: ["admin-categories"] });
       setIsCreateOpen(false);
-      setFormData({ name: "", description: "", basePrice: 0 });
+      setFormData({ name: "", description: "", type: "" });
     },
     onError: () => {
       toast.error("Failed to create category");
@@ -51,7 +51,7 @@ export default function AdminCategoriesPage() {
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
-    createCategoryMutation.mutate({ ...formData, basePrice: Number(formData.basePrice) });
+    createCategoryMutation.mutate({ ...formData });
   };
 
   const handleDelete = (id: string) => {
@@ -95,24 +95,22 @@ export default function AdminCategoriesPage() {
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="type">Type</Label>
+                  <Input 
+                    id="type" 
+                    placeholder="e.g. Recyclable" 
+                    value={formData.type}
+                    onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="description">Description</Label>
                   <Textarea 
                     id="description" 
                     placeholder="e.g. Electronic appliances and batteries" 
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="basePrice">Base Price (৳)</Label>
-                  <Input 
-                    id="basePrice" 
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={formData.basePrice}
-                    onChange={(e) => setFormData(prev => ({ ...prev, basePrice: Number(e.target.value) }))}
                     required
                   />
                 </div>

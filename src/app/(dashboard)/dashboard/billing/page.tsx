@@ -1,23 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { paymentApi } from "@/api/payment.api";
+import { invoiceApi } from "@/api/invoice.api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/role-guard";
-import { CreditCard, Receipt, Loader2 } from "lucide-react";
-
-// Mock data 
-const mockInvoices = [
-  { id: "INV-2023-001", amount: 150.00, status: "PENDING", date: "2023-10-25" },
-  { id: "INV-2023-002", amount: 300.00, status: "PAID", date: "2023-10-10" },
-];
+import { CreditCard, Receipt, Loader2, Info } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BillingPage() {
+  const queryClient = useQueryClient();
   const [processingId, setProcessingId] = useState<string | null>(null);
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["my-invoices"],
+    queryFn: () => invoiceApi.getMyInvoices(),
+  });
 
   const initiatePaymentMutation = useMutation({
     mutationFn: (invoiceId: string) => paymentApi.initiatePayment(invoiceId),
@@ -42,6 +44,8 @@ export default function BillingPage() {
     initiatePaymentMutation.mutate(invoiceId);
   };
 
+  const invoices = (data as any)?.data || [];
+
   return (
     <RoleGuard allowedRoles={["CITIZEN"]}>
       <div className="space-y-6">
@@ -50,56 +54,82 @@ export default function BillingPage() {
           <p className="text-muted-foreground">View your invoices and pay securely via SSLCommerz.</p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {mockInvoices.map((invoice) => (
-            <Card key={invoice.id} className="flex flex-col">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Receipt className="h-5 w-5 text-primary" />
-                      {invoice.id}
-                    </CardTitle>
-                    <CardDescription className="mt-1">
-                      Due: {new Date(invoice.date).toLocaleDateString()}
-                    </CardDescription>
+        {isLoading ? (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2].map((i) => (
+              <div key={i} className="border rounded-xl p-5 space-y-4 bg-card">
+                <Skeleton className="h-8 w-1/2" />
+                <Skeleton className="h-10 w-full mt-4" />
+                <Skeleton className="h-10 w-full mt-4" />
+              </div>
+            ))}
+          </div>
+        ) : isError ? (
+          <div className="text-center py-12 border rounded-xl bg-destructive/10 text-destructive">
+            <p>Failed to load invoices. Please try again later.</p>
+          </div>
+        ) : invoices.length === 0 ? (
+          <div className="text-center py-16 border rounded-xl bg-card border-dashed">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 mb-4">
+              <Info className="h-6 w-6 text-primary" />
+            </div>
+            <h2 className="text-xl font-semibold mb-2">No Invoices Found</h2>
+            <p className="text-muted-foreground max-w-sm mx-auto">
+              You do not have any pending or paid invoices at the moment.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {invoices.map((invoice: any) => (
+              <Card key={invoice.id || invoice._id} className="flex flex-col">
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <Receipt className="h-5 w-5 text-primary" />
+                        INV-{String(invoice.id || invoice._id).slice(0, 8).toUpperCase()}
+                      </CardTitle>
+                      <CardDescription className="mt-1">
+                        Due: {new Date(invoice.dueDate || invoice.createdAt).toLocaleDateString()}
+                      </CardDescription>
+                    </div>
+                    <Badge variant={invoice.status === 'PAID' ? 'default' : 'secondary'}>
+                      {invoice.status}
+                    </Badge>
                   </div>
-                  <Badge variant={invoice.status === 'PAID' ? 'default' : 'secondary'}>
-                    {invoice.status}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="flex-1">
-                <div className="text-3xl font-bold">
-                  ৳{invoice.amount.toFixed(2)}
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Waste Collection Service Fee
-                </p>
-              </CardContent>
-              <CardFooter className="border-t pt-4">
-                {invoice.status === "PENDING" ? (
-                  <Button
-                    className="w-full"
-                    onClick={() => handlePay(invoice.id)}
-                    disabled={processingId === invoice.id}
-                  >
-                    {processingId === invoice.id ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <CreditCard className="mr-2 h-4 w-4" />
-                    )}
-                    Pay via SSLCommerz
-                  </Button>
-                ) : (
-                  <Button variant="outline" className="w-full" disabled>
-                    Paid
-                  </Button>
-                )}
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+                </CardHeader>
+                <CardContent className="flex-1">
+                  <div className="text-3xl font-bold">
+                    ৳{Number(invoice.amount).toFixed(2)}
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Waste Collection Service Fee
+                  </p>
+                </CardContent>
+                <CardFooter className="border-t pt-4">
+                  {invoice.status === "PENDING" ? (
+                    <Button
+                      className="w-full"
+                      onClick={() => handlePay(String(invoice.id || invoice._id))}
+                      disabled={processingId === String(invoice.id || invoice._id)}
+                    >
+                      {processingId === String(invoice.id || invoice._id) ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <CreditCard className="mr-2 h-4 w-4" />
+                      )}
+                      Pay via SSLCommerz
+                    </Button>
+                  ) : (
+                    <Button variant="outline" className="w-full" disabled>
+                      Paid
+                    </Button>
+                  )}
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </RoleGuard>
   );

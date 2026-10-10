@@ -27,8 +27,7 @@ function AdminZonesContent() {
 
   const [searchInput, setSearchInput] = useState(search);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: "", city: "", area: "" });
-
+  const [formData, setFormData] = useState({ name: "", city: "" });
 
   useEffect(() => {
     setSearchInput(search);
@@ -45,7 +44,7 @@ function AdminZonesContent() {
       toast.success("Zone created successfully");
       queryClient.invalidateQueries({ queryKey: ["admin-zones"] });
       setIsCreateOpen(false);
-      setFormData({ name: "", city: "", area: "" });
+      setFormData({ name: "", city: "" });
     },
     onError: () => {
       toast.error("Failed to create zone");
@@ -135,16 +134,6 @@ function AdminZonesContent() {
                     placeholder="e.g. Dhaka"
                     value={formData.city}
                     onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="area">Area</Label>
-                  <Input
-                    id="area"
-                    placeholder="e.g. Uttara"
-                    value={formData.area}
-                    onChange={(e) => setFormData(prev => ({ ...prev, area: e.target.value }))}
                     required
                   />
                 </div>

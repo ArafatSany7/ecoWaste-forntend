@@ -80,9 +80,9 @@ export default function PickupsPage() {
                     {String((req.category as any)?.name || req.wasteType || "Unknown")}
                   </Badge>
                 </div>
-                <h3 className="font-semibold text-lg line-clamp-1">{String(req.title)}</h3>
-                <p className="text-muted-foreground text-sm line-clamp-2 mt-2 flex-1">
-                  {String(req.description)}
+                <h3 className="font-semibold text-lg line-clamp-1">Pickup ID: {String(req.id || req._id).slice(0, 8)}</h3>
+                <p className="text-muted-foreground text-sm mt-2 flex-1">
+                  Weight: {req.weight ? `${req.weight} kg` : 'Not specified'}
                 </p>
 
                 <div className="mt-4 pt-4 border-t space-y-2 text-sm text-muted-foreground">

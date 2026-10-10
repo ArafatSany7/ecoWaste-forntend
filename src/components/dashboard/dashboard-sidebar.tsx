@@ -45,7 +45,6 @@ const sidebarRoutes = {
       items: [
         { title: "Overview", url: "/dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
         { title: "Manage Requests", url: "/dashboard/admin/requests", icon: <Truck className="h-4 w-4" /> },
-        { title: "Manage Users", url: "/dashboard/admin/users", icon: <Users className="h-4 w-4" /> },
         { title: "Manage Zones", url: "/dashboard/admin/zones", icon: <MapPin className="h-4 w-4" /> },
         { title: "Manage Categories", url: "/dashboard/admin/categories", icon: <Tags className="h-4 w-4" /> },
         { title: "Audit Logs", url: "/dashboard/admin/audit-logs", icon: <List className="h-4 w-4" /> },

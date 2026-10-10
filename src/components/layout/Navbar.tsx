@@ -17,10 +17,10 @@ import { useAuthStore } from "@/store/auth.store";
 import { useRouter } from "next/navigation";
 
 const NAV_LINKS = [
-  { name: "How It Works", href: "#how-it-works" },
-  { name: "Features", href: "#features" },
-  { name: "Roles", href: "#roles" },
-  { name: "Sustainability", href: "#sustainability" },
+  { name: "How It Works", href: "/#how-it-works" },
+  { name: "Features", href: "/#features" },
+  { name: "About Us", href: "/about" },
+  { name: "Sustainability", href: "/sustainability" },
 ];
 
 export function Navbar() {
