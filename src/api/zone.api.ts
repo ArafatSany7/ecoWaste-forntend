@@ -1,8 +1,8 @@
 import { apiClient } from "./client";
 
 export const zoneApi = {
-  getAll: async () => {
-    return apiClient.get("/zones");
+  getAll: async (params?: Record<string, any>) => {
+    return apiClient.get("/zones", { params });
   },
   getById: async (id: string) => {
     return apiClient.get(`/zones/${id}`);

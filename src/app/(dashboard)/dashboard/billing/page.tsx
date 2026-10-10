@@ -47,7 +47,7 @@ export default function BillingPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Billing & Payments</h1>
-          <p className="text-muted-foreground">View your invoices and pay securely via bKash.</p>
+          <p className="text-muted-foreground">View your invoices and pay securely via SSLCommerz.</p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -80,7 +80,7 @@ export default function BillingPage() {
               <CardFooter className="border-t pt-4">
                 {invoice.status === "PENDING" ? (
                   <Button
-                    className="w-full bg-[#E2136E] hover:bg-[#b00f55] text-white"
+                    className="w-full"
                     onClick={() => handlePay(invoice.id)}
                     disabled={processingId === invoice.id}
                   >
@@ -89,7 +89,7 @@ export default function BillingPage() {
                     ) : (
                       <CreditCard className="mr-2 h-4 w-4" />
                     )}
-                    Pay with bKash
+                    Pay via SSLCommerz
                   </Button>
                 ) : (
                   <Button variant="outline" className="w-full" disabled>
