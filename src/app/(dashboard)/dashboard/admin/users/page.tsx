@@ -42,7 +42,7 @@ export default function AdminUsersPage() {
     }
   });
 
-  const users = data?.data || [];
+  const users = (data as any)?.data || [];
 
   return (
     <RoleGuard allowedRoles={["ADMIN"]}>
