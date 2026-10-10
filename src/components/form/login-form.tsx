@@ -113,6 +113,47 @@ export function LoginForm() {
       </div>
 
       <GoogleLogin />
+
+      <div className="relative pt-4">
+        <div className="absolute inset-0 flex items-center pt-4">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase pt-4">
+          <span className="bg-card px-2 text-muted-foreground font-semibold">
+            One-Click Demo Login
+          </span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2">
+        <Button 
+          variant="outline" 
+          type="button" 
+          className="text-xs"
+          onClick={() => onSubmit({ email: "admin@example.com", password: "password123" })}
+          disabled={isLoading}
+        >
+          Admin
+        </Button>
+        <Button 
+          variant="outline" 
+          type="button" 
+          className="text-xs"
+          onClick={() => onSubmit({ email: "citizen@example.com", password: "password123" })}
+          disabled={isLoading}
+        >
+          Citizen
+        </Button>
+        <Button 
+          variant="outline" 
+          type="button" 
+          className="text-xs"
+          onClick={() => onSubmit({ email: "collector@example.com", password: "password123" })}
+          disabled={isLoading}
+        >
+          Collector
+        </Button>
+      </div>
       
       <div className="text-center text-sm">
         Don&apos;t have an account?{" "}
