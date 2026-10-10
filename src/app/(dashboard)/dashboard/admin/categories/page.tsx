@@ -35,7 +35,7 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  const categories = data?.data?.data || [];
+  const categories = data?.data || [];
 
   return (
     <RoleGuard allowedRoles={["ADMIN"]}>

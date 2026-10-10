@@ -41,17 +41,17 @@ export default function DashboardOverviewPage() {
   let totalRequests = 0;
   let completedRequests = 0;
 
-  if (role === "ADMIN" && adminData?.data?.data) {
-    totalRequests = adminData.data.data.wasteRequests?.total || 0;
-    completedRequests = adminData.data.data.wasteRequests?.breakdown?.COMPLETED || 0;
-  } else if (requestsData?.data?.data) {
-    const reqs = requestsData.data.data;
+  if (role === "ADMIN" && adminData?.data) {
+    totalRequests = adminData.data.wasteRequests?.total || 0;
+    completedRequests = adminData.data.wasteRequests?.breakdown?.COMPLETED || 0;
+  } else if (requestsData?.data) {
+    const reqs = requestsData.data;
     totalRequests = reqs.length;
     completedRequests = reqs.filter((r: any) => r.status === "COMPLETED").length;
   }
 
   const completionRate = totalRequests > 0 ? Math.round((completedRequests / totalRequests) * 100) : 0;
-  const adminStats = adminData?.data?.data;
+  const adminStats = adminData?.data;
 
   return (
     <RoleGuard allowedRoles={["CITIZEN", "COLLECTOR", "ADMIN"]}>

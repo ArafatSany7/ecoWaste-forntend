@@ -50,7 +50,6 @@ const sidebarRoutes = {
         { title: "Manage Categories", url: "/dashboard/admin/categories", icon: <Tags className="h-4 w-4" /> },
         { title: "Audit Logs", url: "/dashboard/admin/audit-logs", icon: <List className="h-4 w-4" /> },
         { title: "Feedbacks", url: "/dashboard/admin/feedbacks", icon: <MessageSquare className="h-4 w-4" /> },
-        { title: "Settings", url: "/dashboard/settings", icon: <Settings className="h-4 w-4" /> },
       ]
     }
   ]

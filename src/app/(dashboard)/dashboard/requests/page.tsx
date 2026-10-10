@@ -18,7 +18,7 @@ export default function RequestsPage() {
     queryFn: () => wasteRequestApi.getMyRequests(),
   });
 
-  const requests = data?.data?.data || [];
+  const requests = data?.data || [];
 
   return (
     <div className="space-y-6">

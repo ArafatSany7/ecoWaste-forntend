@@ -34,7 +34,7 @@ export default function PickupsPage() {
     updateStatusMutation.mutate({ id, status: newStatus });
   };
 
-  const requests = data?.data?.data || [];
+  const requests = data?.data || [];
 
   return (
     <RoleGuard allowedRoles={["COLLECTOR", "ADMIN"]}>

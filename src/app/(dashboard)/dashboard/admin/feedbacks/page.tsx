@@ -14,7 +14,7 @@ export default function FeedbacksPage() {
     queryFn: () => feedbackApi.getAll(),
   });
 
-  const feedbacks = data?.data?.data || [];
+  const feedbacks = data?.data || [];
 
   return (
     <RoleGuard allowedRoles={["ADMIN"]}>

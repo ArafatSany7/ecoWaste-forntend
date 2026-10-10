@@ -13,7 +13,7 @@ export default function AuditLogsPage() {
     queryFn: () => adminApi.getAuditLogs(),
   });
 
-  const logs = data?.data?.data || [];
+  const logs = data?.data || [];
 
   return (
     <RoleGuard allowedRoles={["ADMIN"]}>

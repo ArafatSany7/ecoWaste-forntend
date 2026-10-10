@@ -70,8 +70,8 @@ function AdminZonesContent() {
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  const zones = data?.data?.data || [];
-  const total = data?.data?.meta?.total || 0;
+  const zones = data?.data || [];
+  const total = data?.meta?.total || 0;
   const totalPages = Math.ceil(total / limit) || 1;
 
   return (
