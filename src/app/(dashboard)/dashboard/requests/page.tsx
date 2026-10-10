@@ -81,7 +81,7 @@ export default function RequestsPage() {
                   {String(req.status || "PENDING")}
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
-                  {String(req.wasteType)}
+                  {String((req.category as any)?.name || req.wasteType || "Unknown")}
                 </Badge>
               </div>
               <h3 className="font-semibold text-lg line-clamp-1">{String(req.title)}</h3>

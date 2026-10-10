@@ -85,7 +85,7 @@ export default function AdminRequestsPage() {
                       {String(req.id || req._id).slice(-6).toUpperCase()}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{String(req.wasteType)}</Badge>
+                      <Badge variant="outline">{String((req.category as any)?.name || req.wasteType || "Unknown")}</Badge>
                     </TableCell>
                     <TableCell className="max-w-[200px] truncate">
                       {String(req.address)}
@@ -105,21 +105,25 @@ export default function AdminRequestsPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Select
-                        defaultValue={String(req.status || "PENDING")}
-                        onValueChange={(val) => handleStatusChange(String(req.id || req._id), val as string)}
-                        disabled={updateStatusMutation.isPending}
-                      >
-                        <SelectTrigger className="w-[130px] ml-auto">
-                          <SelectValue placeholder="Update Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="PENDING">Pending</SelectItem>
-                          <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                          <SelectItem value="COMPLETED">Completed</SelectItem>
-                          <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {req.status === 'COMPLETED' ? (
+                        <span className="text-sm text-muted-foreground mr-4">Done</span>
+                      ) : (
+                        <Select
+                          defaultValue={String(req.status || "PENDING")}
+                          onValueChange={(val) => handleStatusChange(String(req.id || req._id), val as string)}
+                          disabled={updateStatusMutation.isPending}
+                        >
+                          <SelectTrigger className="w-[130px] ml-auto">
+                            <SelectValue placeholder="Update Status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="PENDING">Pending</SelectItem>
+                            <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                            <SelectItem value="COMPLETED">Completed</SelectItem>
+                            <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

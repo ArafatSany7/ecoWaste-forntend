@@ -77,7 +77,7 @@ export default function PickupsPage() {
                     {String(req.status || "PENDING")}
                   </Badge>
                   <Badge variant="secondary" className="text-xs">
-                    {String(req.wasteType)}
+                    {String((req.category as any)?.name || req.wasteType || "Unknown")}
                   </Badge>
                 </div>
                 <h3 className="font-semibold text-lg line-clamp-1">{String(req.title)}</h3>
@@ -97,21 +97,27 @@ export default function PickupsPage() {
 
 
                   <div className="pt-4 mt-2 border-t">
-                    <Select
-                      defaultValue={String(req.status || "PENDING")}
-                      onValueChange={(val) => handleStatusChange(String(req.id || req._id), val as string)}
-                      disabled={updateStatusMutation.isPending}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Update Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="PENDING">Pending</SelectItem>
-                        <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                        <SelectItem value="COMPLETED">Completed</SelectItem>
-                        <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    {req.status === 'COMPLETED' ? (
+                      <div className="w-full text-center py-2 bg-muted/50 rounded-md text-sm font-medium text-muted-foreground">
+                        Job Completed
+                      </div>
+                    ) : (
+                      <Select
+                        defaultValue={String(req.status || "PENDING")}
+                        onValueChange={(val) => handleStatusChange(String(req.id || req._id), val as string)}
+                        disabled={updateStatusMutation.isPending}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Update Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="PENDING">Pending</SelectItem>
+                          <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                          <SelectItem value="COMPLETED">Completed</SelectItem>
+                          <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
                   </div>
                 </div>
               </div>
