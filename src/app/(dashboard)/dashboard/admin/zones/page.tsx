@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import { MapPin, Plus, Trash2, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 function AdminZonesContent() {
   const queryClient = useQueryClient();
@@ -24,8 +26,10 @@ function AdminZonesContent() {
   const limit = 10;
 
   const [searchInput, setSearchInput] = useState(search);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [formData, setFormData] = useState({ name: "", city: "", area: "" });
 
-  // Sync state with URL search param on mount or URL change
+
   useEffect(() => {
     setSearchInput(search);
   }, [search]);
@@ -33,6 +37,19 @@ function AdminZonesContent() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["admin-zones", page, search],
     queryFn: () => zoneApi.getAll({ page, limit, search }),
+  });
+
+  const createZoneMutation = useMutation({
+    mutationFn: (data: Record<string, unknown>) => zoneApi.create(data),
+    onSuccess: () => {
+      toast.success("Zone created successfully");
+      queryClient.invalidateQueries({ queryKey: ["admin-zones"] });
+      setIsCreateOpen(false);
+      setFormData({ name: "", city: "", area: "" });
+    },
+    onError: () => {
+      toast.error("Failed to create zone");
+    }
   });
 
   const deleteZoneMutation = useMutation({
@@ -45,6 +62,11 @@ function AdminZonesContent() {
       toast.error("Failed to delete zone");
     }
   });
+
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    createZoneMutation.mutate(formData);
+  };
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this zone?")) {
@@ -82,15 +104,64 @@ function AdminZonesContent() {
             <h1 className="text-3xl font-bold tracking-tight">Manage Zones</h1>
             <p className="text-muted-foreground">Manage city zones for waste collection assignment.</p>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Zone
-          </Button>
+
+          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+            <DialogTrigger render={<Button />}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Zone
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create Zone</DialogTitle>
+                <DialogDescription>
+                  Add a new operational zone for collections.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleCreate} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Zone Name</Label>
+                  <Input
+                    id="name"
+                    placeholder="e.g. Uttara Zone 1"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="city">City</Label>
+                  <Input
+                    id="city"
+                    placeholder="e.g. Dhaka"
+                    value={formData.city}
+                    onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="area">Area</Label>
+                  <Input
+                    id="area"
+                    placeholder="e.g. Uttara"
+                    value={formData.area}
+                    onChange={(e) => setFormData(prev => ({ ...prev, area: e.target.value }))}
+                    required
+                  />
+                </div>
+                <DialogFooter>
+                  <Button type="submit" disabled={createZoneMutation.isPending}>
+                    {createZoneMutation.isPending ? "Creating..." : "Create Zone"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+
         </div>
 
         <form onSubmit={handleSearch} className="flex gap-2 max-w-sm">
-          <Input 
-            placeholder="Search zones..." 
+          <Input
+            placeholder="Search zones..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
@@ -123,7 +194,7 @@ function AdminZonesContent() {
                 Clear Search
               </Button>
             ) : (
-              <Button variant="outline">
+              <Button variant="outline" onClick={() => setIsCreateOpen(true)}>
                 Create First Zone
               </Button>
             )}
@@ -149,9 +220,9 @@ function AdminZonesContent() {
                         <Badge variant="outline">Active</Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           className="text-destructive hover:text-destructive hover:bg-destructive/10"
                           onClick={() => handleDelete(String(zone.id || zone._id))}
                           disabled={deleteZoneMutation.isPending}
@@ -170,18 +241,18 @@ function AdminZonesContent() {
                 Showing {((page - 1) * limit) + 1} to {Math.min(page * limit, total || 1)} of {total || zones.length} zones
               </p>
               <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => handlePageChange(page - 1)}
                   disabled={page <= 1}
                 >
                   <ChevronLeft className="h-4 w-4 mr-1" />
                   Previous
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => handlePageChange(page + 1)}
                   disabled={page >= totalPages}
                 >

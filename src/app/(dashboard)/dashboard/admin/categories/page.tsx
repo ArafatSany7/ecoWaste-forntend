@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { wasteCategoryApi } from "@/api/waste-category.api";
 import { RoleGuard } from "@/components/auth/role-guard";
@@ -9,13 +10,32 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Tags, Plus, Trash2, Edit } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function AdminCategoriesPage() {
   const queryClient = useQueryClient();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [formData, setFormData] = useState({ name: "", description: "", basePrice: 0 });
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["admin-categories"],
     queryFn: () => wasteCategoryApi.getAll(),
+  });
+
+  const createCategoryMutation = useMutation({
+    mutationFn: (data: Record<string, unknown>) => wasteCategoryApi.create(data),
+    onSuccess: () => {
+      toast.success("Category created successfully");
+      queryClient.invalidateQueries({ queryKey: ["admin-categories"] });
+      setIsCreateOpen(false);
+      setFormData({ name: "", description: "", basePrice: 0 });
+    },
+    onError: () => {
+      toast.error("Failed to create category");
+    }
   });
 
   const deleteCategoryMutation = useMutation({
@@ -28,6 +48,11 @@ export default function AdminCategoriesPage() {
       toast.error("Failed to delete category");
     }
   });
+
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    createCategoryMutation.mutate({ ...formData, basePrice: Number(formData.basePrice) });
+  };
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this category?")) {
@@ -45,10 +70,61 @@ export default function AdminCategoriesPage() {
             <h1 className="text-3xl font-bold tracking-tight">Waste Categories</h1>
             <p className="text-muted-foreground">Manage types of waste and their collection pricing.</p>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Category
-          </Button>
+          
+          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+            <DialogTrigger render={<Button />}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Category
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create Category</DialogTitle>
+                <DialogDescription>
+                  Add a new waste category to the system.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleCreate} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input 
+                    id="name" 
+                    placeholder="e.g. E-Waste" 
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea 
+                    id="description" 
+                    placeholder="e.g. Electronic appliances and batteries" 
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="basePrice">Base Price (৳)</Label>
+                  <Input 
+                    id="basePrice" 
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formData.basePrice}
+                    onChange={(e) => setFormData(prev => ({ ...prev, basePrice: Number(e.target.value) }))}
+                    required
+                  />
+                </div>
+                <DialogFooter>
+                  <Button type="submit" disabled={createCategoryMutation.isPending}>
+                    {createCategoryMutation.isPending ? "Creating..." : "Create Category"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+
         </div>
 
         {isLoading ? (
@@ -70,7 +146,7 @@ export default function AdminCategoriesPage() {
             <p className="text-muted-foreground max-w-sm mx-auto mb-6">
               There are currently no waste categories defined in the system.
             </p>
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => setIsCreateOpen(true)}>
               Create First Category
             </Button>
           </div>
