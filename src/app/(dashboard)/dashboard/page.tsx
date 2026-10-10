@@ -151,7 +151,7 @@ export default function DashboardOverviewPage() {
         </div>
 
 
-        <DashboardCharts />
+        {role === "ADMIN" && <DashboardCharts />}
       </div>
     </RoleGuard>
   );
