@@ -131,7 +131,7 @@ export function LoginForm() {
           variant="outline"
           type="button"
           className="text-xs"
-          onClick={() => onSubmit({ email: "admin@example.com", password: "password123" })}
+          onClick={() => onSubmit({ email: "admin@ecowaste.com", password: "admin123" })}
           disabled={isLoading}
         >
           Admin
@@ -140,7 +140,7 @@ export function LoginForm() {
           variant="outline"
           type="button"
           className="text-xs"
-          onClick={() => onSubmit({ email: "citizen@example.com", password: "password123" })}
+          onClick={() => onSubmit({ email: "citizen1@example.com", password: "password123" })}
           disabled={isLoading}
         >
           Citizen
@@ -149,7 +149,7 @@ export function LoginForm() {
           variant="outline"
           type="button"
           className="text-xs"
-          onClick={() => onSubmit({ email: "collector@example.com", password: "password123" })}
+          onClick={() => onSubmit({ email: "collector1@ecowaste.com", password: "password123" })}
           disabled={isLoading}
         >
           Collector
