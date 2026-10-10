@@ -13,6 +13,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useAuthStore } from "@/store/auth.store";
+import { useRouter } from "next/navigation";
 
 const NAV_LINKS = [
   { name: "How It Works", href: "#how-it-works" },
@@ -24,6 +26,13 @@ const NAV_LINKS = [
 export function Navbar() {
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const { isAuthenticated, logout } = useAuthStore();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/");
+  };
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -70,16 +79,31 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-4">
             <ThemeToggle />
             <div className="h-4 w-px bg-border"></div>
-            <Link href="/login">
-              <Button variant="ghost" size="sm">
-                Log in
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button size="sm" className="rounded-full px-6">
-                Get Started
-              </Button>
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link href="/dashboard">
+                  <Button variant="ghost" size="sm">
+                    Dashboard
+                  </Button>
+                </Link>
+                <Button size="sm" variant="outline" onClick={handleLogout} className="rounded-full px-6">
+                  Log out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" size="sm">
+                    Log in
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button size="sm" className="rounded-full px-6">
+                    Get Started
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -111,16 +135,38 @@ export function Navbar() {
                     </Link>
                   ))}
                   <div className="mt-4 flex flex-col gap-3">
-                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full justify-start">
-                        Log in
-                      </Button>
-                    </Link>
-                    <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button className="w-full justify-start rounded-full">
-                        Get Started
-                      </Button>
-                    </Link>
+                    {isAuthenticated ? (
+                      <>
+                        <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Button variant="outline" className="w-full justify-start">
+                            Dashboard
+                          </Button>
+                        </Link>
+                        <Button 
+                          variant="destructive" 
+                          className="w-full justify-start rounded-full"
+                          onClick={() => {
+                            handleLogout();
+                            setIsMobileMenuOpen(false);
+                          }}
+                        >
+                          Log out
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Button variant="outline" className="w-full justify-start">
+                            Log in
+                          </Button>
+                        </Link>
+                        <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Button className="w-full justify-start rounded-full">
+                            Get Started
+                          </Button>
+                        </Link>
+                      </>
+                    )}
                   </div>
                 </div>
               </SheetContent>

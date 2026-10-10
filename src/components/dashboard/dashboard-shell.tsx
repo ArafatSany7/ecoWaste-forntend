@@ -1,3 +1,5 @@
+"use client";
+
 import {
   SidebarInset,
   SidebarProvider,
@@ -8,7 +10,7 @@ import { ReactNode } from "react";
 import { useAuthStore } from "@/store/auth.store";
 
 export function DashboardShell({ children }: { children: ReactNode }) {
-  const user = useAuthStore.getState().user;
+  const user = useAuthStore((state) => state.user);
   const role = user?.role || "CITIZEN";
 
   return (
