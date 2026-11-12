@@ -2,22 +2,13 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Menu, Leaf } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { MaxWidthWrapper } from "@/components/layout/MaxWidthWrapper";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Menu, X, Leaf } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "@/store/auth.store";
 import { useRouter } from "next/navigation";
 
 const NAV_LINKS = [
-  { name: "How It Works", href: "/#how-it-works" },
+  { name: "How It Works", href: "/#story" },
   { name: "Features", href: "/#features" },
   { name: "About Us", href: "/about" },
   { name: "Sustainability", href: "/sustainability" },
@@ -35,31 +26,35 @@ export function Navbar() {
   };
 
   React.useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
-    <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-        isScrolled
-          ? "bg-background/80 backdrop-blur-md border-b shadow-sm"
-          : "bg-transparent border-transparent"
-      }`}
-    >
-      <MaxWidthWrapper>
-        <div className="flex h-16 items-center justify-between">
+    <>
+      <motion.header
+        initial={{ y: -80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled
+            ? "bg-white/80 backdrop-blur-md border-b border-slate-200/80 shadow-sm"
+            : "bg-white/40 backdrop-blur-sm border-b border-slate-100/60"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-6 flex h-16 items-center justify-between">
+
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 transition-transform hover:scale-105">
-            <div className="bg-primary p-1.5 rounded-lg">
-              <Leaf className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-foreground">
-              EcoWaste
-            </span>
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <motion.div
+              whileHover={{ rotate: 10, scale: 1.08 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-tr from-emerald-600 to-teal-500 shadow-md shadow-emerald-500/20"
+            >
+              <Leaf className="w-5 h-5 text-white" />
+            </motion.div>
+            <span className="text-xl font-black text-slate-900 tracking-tight">EcoWaste</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -68,7 +63,7 @@ export function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                className="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors duration-200"
               >
                 {link.name}
               </Link>
@@ -76,104 +71,142 @@ export function Navbar() {
           </nav>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-4">
-            <ThemeToggle />
-            <div className="h-4 w-px bg-border"></div>
+          <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
               <>
                 <Link href="/dashboard">
-                  <Button variant="ghost" size="sm">
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="px-4 py-2 rounded-full text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 transition-all"
+                  >
                     Dashboard
-                  </Button>
+                  </motion.button>
                 </Link>
-                <Button size="sm" variant="outline" onClick={handleLogout} className="rounded-full px-6">
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleLogout}
+                  className="px-4 py-2 rounded-full text-sm font-semibold border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-all"
+                >
                   Log out
-                </Button>
+                </motion.button>
               </>
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" size="sm">
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="px-4 py-2 rounded-full text-sm font-semibold text-slate-700 hover:text-slate-950 transition-all"
+                  >
                     Log in
-                  </Button>
+                  </motion.button>
                 </Link>
                 <Link href="/register">
-                  <Button size="sm" className="rounded-full px-6">
+                  <motion.button
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="px-5 py-2 rounded-full text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/25 transition-all"
+                  >
                     Get Started
-                  </Button>
+                  </motion.button>
                 </Link>
               </>
             )}
           </div>
 
           {/* Mobile Menu Toggle */}
-          <div className="flex items-center gap-4 md:hidden">
-            <ThemeToggle />
-            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-              <SheetTrigger className="inline-flex h-9 w-9 items-center justify-center whitespace-nowrap rounded-md hover:bg-accent hover:text-accent-foreground">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Menu</span>
-              </SheetTrigger>
-              <SheetContent side="right" className="flex flex-col border-l-0 sm:max-w-xs">
-                <SheetHeader className="border-b pb-4 text-left">
-                  <SheetTitle className="flex items-center gap-2">
-                    <div className="bg-primary p-1.5 rounded-lg">
-                      <Leaf className="h-5 w-5 text-primary-foreground" />
-                    </div>
-                    EcoWaste
-                  </SheetTitle>
-                </SheetHeader>
-                <div className="flex flex-col gap-6 py-6">
-                  {NAV_LINKS.map((link) => (
-                    <Link
-                      key={link.name}
-                      href={link.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="text-lg font-medium text-foreground hover:text-primary transition-colors"
-                    >
-                      {link.name}
-                    </Link>
-                  ))}
-                  <div className="mt-4 flex flex-col gap-3">
-                    {isAuthenticated ? (
-                      <>
-                        <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-                          <Button variant="outline" className="w-full justify-start">
-                            Dashboard
-                          </Button>
-                        </Link>
-                        <Button 
-                          variant="destructive" 
-                          className="w-full justify-start rounded-full"
-                          onClick={() => {
-                            handleLogout();
-                            setIsMobileMenuOpen(false);
-                          }}
-                        >
-                          Log out
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                          <Button variant="outline" className="w-full justify-start">
-                            Log in
-                          </Button>
-                        </Link>
-                        <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                          <Button className="w-full justify-start rounded-full">
-                            Get Started
-                          </Button>
-                        </Link>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+          <button
+            className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 text-slate-700 border border-slate-200"
+            onClick={() => setIsMobileMenuOpen((v) => !v)}
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen
+              ? <X className="h-5 w-5 text-slate-900" />
+              : <Menu className="h-5 w-5 text-slate-900" />
+            }
+          </button>
         </div>
-      </MaxWidthWrapper>
-    </header>
+      </motion.header>
+
+      {/* Mobile Menu Drawer */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: "100%" }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: "100%" }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed inset-y-0 right-0 z-40 w-72 bg-white border-l border-slate-200 flex flex-col pt-20 pb-8 px-6 gap-8 shadow-2xl"
+          >
+            <nav className="flex flex-col gap-5">
+              {NAV_LINKS.map((link, i) => (
+                <motion.div
+                  key={link.name}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <Link
+                    href={link.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-lg font-bold text-slate-800 hover:text-emerald-600 transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </motion.div>
+              ))}
+            </nav>
+
+            <div className="flex flex-col gap-3 mt-auto">
+              {isAuthenticated ? (
+                <>
+                  <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                    <button className="w-full py-3 rounded-full text-sm font-bold bg-slate-100 text-slate-900">
+                      Dashboard
+                    </button>
+                  </Link>
+                  <button
+                    onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
+                    className="w-full py-3 rounded-full text-sm font-semibold border border-slate-200 text-slate-600"
+                  >
+                    Log out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                    <button className="w-full py-3 rounded-full text-sm font-semibold border border-slate-200 text-slate-700">
+                      Log in
+                    </button>
+                  </Link>
+                  <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                    <button
+                      className="w-full py-3 rounded-full text-sm font-bold text-white bg-emerald-600 shadow-md shadow-emerald-600/25"
+                    >
+                      Get Started
+                    </button>
+                  </Link>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Mobile overlay */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-30 md:hidden bg-slate-900/40 backdrop-blur-xs"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+    </>
   );
 }

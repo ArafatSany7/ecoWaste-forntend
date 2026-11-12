@@ -9,7 +9,8 @@ export default function PublicLayout({
   return (
     <>
       <Navbar />
-      <div className="flex flex-col min-h-[calc(100vh-4rem)]">
+      {/* No top padding on the landing page — hero is full viewport with fixed navbar overlay */}
+      <div className="flex flex-col min-h-screen bg-white text-slate-900">
         {children}
       </div>
       <Footer />

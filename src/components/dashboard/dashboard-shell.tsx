@@ -17,13 +17,27 @@ export function DashboardShell({ children }: { children: ReactNode }) {
     <SidebarProvider>
       <DashboardSidebar role={role} />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 bg-background">
-          <SidebarTrigger className="-ml-1" />
-          <div className="flex flex-1 justify-end items-center px-4">
-
-          </div>
+        {/* Top bar */}
+        <header
+          className="flex h-14 shrink-0 items-center gap-3 border-b px-4"
+          style={{
+            background: "var(--eco-forest)",
+            borderColor: "oklch(1 0 0 / 0.08)",
+          }}
+        >
+          <SidebarTrigger
+            className="-ml-1 text-white/60 hover:text-white transition-colors"
+          />
+          <div className="h-4 w-px" style={{ background: "oklch(1 0 0 / 0.1)" }} />
+          <span className="text-xs font-medium uppercase tracking-widest" style={{ color: "oklch(0.72 0.22 160)" }}>
+            EcoWaste Command Centre
+          </span>
         </header>
-        <main className="flex-1 overflow-auto bg-muted/40 p-4 md:p-8">
+
+        <main
+          className="flex-1 overflow-auto p-4 md:p-8"
+          style={{ background: "var(--eco-void)" }}
+        >
           {children}
         </main>
       </SidebarInset>
