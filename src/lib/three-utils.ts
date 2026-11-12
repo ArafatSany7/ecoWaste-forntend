@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-/** Returns normalised mouse position in [-1, 1] relative to viewport. */
 export function useMouseNorm() {
   const mouse = useRef({ x: 0, y: 0 });
 
@@ -18,24 +17,20 @@ export function useMouseNorm() {
   return mouse;
 }
 
-/** Returns true once the component has mounted (safe SSR guard). */
 export function useIsMounted() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   return mounted;
 }
 
-/** Lerp helper for smooth value interpolation. */
 export function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
 }
 
-/** Clamp helper */
 export function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
-/** Map a value from one range to another. */
 export function mapRange(
   value: number,
   inMin: number,
@@ -45,4 +40,3 @@ export function mapRange(
 ) {
   return ((value - inMin) / (inMax - inMin)) * (outMax - outMin) + outMin;
 }
-
