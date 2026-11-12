@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { ScrollProgress } from "@/components/motion/primitives";
 
 export default function PublicLayout({
   children,
@@ -7,13 +8,11 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="site relative flex min-h-screen flex-col">
+      <ScrollProgress />
       <Navbar />
-      {/* No top padding on the landing page — hero is full viewport with fixed navbar overlay */}
-      <div className="flex flex-col min-h-screen bg-white text-slate-900">
-        {children}
-      </div>
+      <div className="flex flex-1 flex-col">{children}</div>
       <Footer />
-    </>
+    </div>
   );
 }

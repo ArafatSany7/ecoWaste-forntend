@@ -10,7 +10,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
 import { Receipt, Loader2, Info, CheckCircle2, CreditCard } from "lucide-react";
 
-/* ─── Invoice Card ───────────────────────────────────────────────────── */
 function InvoiceCard({ invoice, onPay, isProcessing }: {
   invoice: any;
   onPay: (id: string) => void;
@@ -40,13 +39,11 @@ function InvoiceCard({ invoice, onPay, isProcessing }: {
         backdropFilter: "blur(16px)",
       }}
     >
-      {/* Background glow blob */}
       <div
         className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-10 pointer-events-none"
         style={{ background: glowColor, transform: "translate(40%, -40%)" }}
       />
 
-      {/* Top Row */}
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
@@ -58,7 +55,6 @@ function InvoiceCard({ invoice, onPay, isProcessing }: {
           </span>
         </div>
 
-        {/* Status badge */}
         <div
           className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
           style={{
@@ -72,7 +68,6 @@ function InvoiceCard({ invoice, onPay, isProcessing }: {
         </div>
       </div>
 
-      {/* Amount */}
       <div>
         <div className="text-4xl font-black" style={{ color: glowColor }}>
           ৳{amount}
@@ -82,7 +77,6 @@ function InvoiceCard({ invoice, onPay, isProcessing }: {
         </div>
       </div>
 
-      {/* Action */}
       {isPaid ? (
         <div
           className="w-full py-3 rounded-xl text-center text-sm font-medium"
@@ -121,7 +115,6 @@ function InvoiceCard({ invoice, onPay, isProcessing }: {
   );
 }
 
-/* ─── Empty State ────────────────────────────────────────────────────── */
 function EmptyState({ message }: { message: string }) {
   return (
     <div
@@ -139,7 +132,6 @@ function EmptyState({ message }: { message: string }) {
   );
 }
 
-/* ─── Page ───────────────────────────────────────────────────────────── */
 export default function BillingPage() {
   const queryClient = useQueryClient();
   const [processingId, setProcessingId] = useState<string | null>(null);
@@ -149,7 +141,6 @@ export default function BillingPage() {
     queryFn: () => invoiceApi.getMyInvoices(),
   });
 
-  /* Payment mutation — logic untouched */
   const initiatePaymentMutation = useMutation({
     mutationFn: (invoiceId: string) => paymentApi.initiatePayment(invoiceId),
     onSuccess: (data) => {
@@ -180,8 +171,6 @@ export default function BillingPage() {
   return (
     <RoleGuard allowedRoles={["CITIZEN"]}>
       <div className="space-y-10">
-
-        {/* Page header */}
         <motion.div
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -217,8 +206,6 @@ export default function BillingPage() {
           </div>
         ) : (
           <div className="space-y-12">
-
-            {/* Pending */}
             <section>
               <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                 <span
@@ -245,7 +232,6 @@ export default function BillingPage() {
               )}
             </section>
 
-            {/* History */}
             <section>
               <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                 <span
@@ -271,7 +257,6 @@ export default function BillingPage() {
                 </div>
               )}
             </section>
-
           </div>
         )}
       </div>
