@@ -16,7 +16,6 @@ const DashboardCharts = dynamic(() => import("@/components/dashboard/dashboard-c
   loading: () => <Skeleton className="w-full h-[400px] rounded-2xl" />,
 });
 
-/* ─── Glassmorphic KPI Card ──────────────────────────────────────────── */
 interface KpiCardProps {
   title: string;
   value: React.ReactNode;
@@ -41,7 +40,6 @@ function KpiCard({ title, value, sub, icon, glowColor, delay = 0 }: KpiCardProps
         backdropFilter: "blur(16px)",
       }}
     >
-      {/* Background glow blob */}
       <div
         className="absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl opacity-20 pointer-events-none"
         style={{ background: glowColor, transform: "translate(30%, -30%)" }}
@@ -65,7 +63,6 @@ function KpiCard({ title, value, sub, icon, glowColor, delay = 0 }: KpiCardProps
   );
 }
 
-/* ─── Page ─────────────────────────────────────────────────────────── */
 export default function DashboardOverviewPage() {
   const user = useAuthStore((state) => state.user);
   const role = user?.role || "CITIZEN";
@@ -103,8 +100,6 @@ export default function DashboardOverviewPage() {
   return (
     <RoleGuard allowedRoles={["CITIZEN", "COLLECTOR", "ADMIN"]}>
       <div className="space-y-8">
-
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -120,7 +115,6 @@ export default function DashboardOverviewPage() {
           </p>
         </motion.div>
 
-        {/* KPI Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {isLoading ? (
             Array.from({ length: 4 }).map((_, i) => (
@@ -188,7 +182,6 @@ export default function DashboardOverviewPage() {
           )}
         </div>
 
-        {/* Charts — admin only */}
         {role === "ADMIN" && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}

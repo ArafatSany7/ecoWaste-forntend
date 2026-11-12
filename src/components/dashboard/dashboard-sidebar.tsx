@@ -74,7 +74,6 @@ export function DashboardSidebar({ role }: { role: "CITIZEN" | "COLLECTOR" | "AD
         borderRight: "1px solid oklch(1 0 0 / 0.07)",
       }}
     >
-      {/* Header */}
       <SidebarHeader
         className="h-14 flex items-center justify-center px-4 border-b"
         style={{ borderColor: "oklch(1 0 0 / 0.08)" }}
@@ -121,7 +120,6 @@ export function DashboardSidebar({ role }: { role: "CITIZEN" | "COLLECTOR" | "AD
                           color: isActive ? item.color : "oklch(0.65 0.04 160)",
                         }}
                       >
-                        {/* Active neon left accent */}
                         {isActive && (
                           <motion.div
                             layoutId="sidebar-active"
