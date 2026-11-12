@@ -21,34 +21,32 @@ const FOOTER_LINKS = {
 
 export function Footer() {
   return (
-    <footer className="border-t border-slate-200 bg-slate-50 pb-12 pt-16 mt-auto text-slate-600">
+    <footer className="relative mt-auto overflow-hidden border-t border-[var(--site-line)] pt-20">
       <MaxWidthWrapper>
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-16">
-
-          {/* Brand */}
-          <div className="flex flex-col gap-5">
-            <Link href="/" className="flex items-center gap-2.5 w-fit">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-tr from-emerald-600 to-teal-500 shadow-sm">
-                <Leaf className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-black text-slate-900 tracking-tight">EcoWaste</span>
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div className="flex max-w-sm flex-col gap-5">
+            <Link href="/" className="flex w-fit items-center gap-2.5">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--site-accent)] text-white">
+                <Leaf className="h-4 w-4" />
+              </span>
+              <span className="text-lg font-semibold tracking-tight">EcoWaste</span>
             </Link>
-            <p className="text-sm leading-relaxed text-slate-500">
+            <p className="text-sm leading-relaxed text-muted-foreground">
               Smarter waste management for smarter cities. Connecting citizens with efficient, transparent field service operations.
             </p>
           </div>
 
-          {/* Links */}
           {Object.entries(FOOTER_LINKS).map(([category, links]) => (
             <div key={category} className="flex flex-col gap-4">
-              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">{category}</h3>
-              <ul className="flex flex-col gap-3">
+              <h3 className="text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--site-accent)]">{category}</h3>
+              <ul className="flex flex-col gap-1">
                 {links.map((link) => (
                   <li key={link.name}>
                     <Link
                       href={link.href}
-                      className="text-sm text-slate-500 hover:text-emerald-600 transition-colors duration-150"
+                      className="group inline-flex min-h-9 items-center gap-2 text-sm text-muted-foreground transition-all duration-300 hover:translate-x-1 hover:text-foreground"
                     >
+                      <span className="h-px w-0 bg-[var(--site-accent)] transition-all duration-300 group-hover:w-3" />
                       {link.name}
                     </Link>
                   </li>
@@ -58,11 +56,16 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 md:flex-row text-xs text-slate-400">
+        <div className="mt-16 select-none text-center text-[22vw] font-semibold leading-[0.8] tracking-tighter text-outline opacity-60 lg:text-[16rem]">
+          EcoWaste
+        </div>
+
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-[var(--site-line)] py-8 text-xs text-muted-foreground md:flex-row">
           <p>© {new Date().getFullYear()} EcoWaste Inc. All rights reserved.</p>
           <div className="flex gap-6">
-            <Link href="/privacy" className="hover:text-slate-700 transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-slate-700 transition-colors">Terms</Link>
+            <Link href="/privacy" className="transition-colors hover:text-foreground">Privacy</Link>
+            <Link href="/terms" className="transition-colors hover:text-foreground">Terms</Link>
+            <Link href="/cookies" className="transition-colors hover:text-foreground">Cookies</Link>
           </div>
         </div>
       </MaxWidthWrapper>

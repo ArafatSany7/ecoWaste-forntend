@@ -1,582 +1,385 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
-import Link from "next/link";
-import { ArrowRight, ArrowDown, MapPin, Zap, Truck, ShieldCheck, Leaf, CheckCircle2 } from "lucide-react";
-import { useIsMounted } from "@/lib/three-utils";
+import { useRef } from "react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useSpring,
+  useReducedMotion,
+  type MotionValue,
+} from "framer-motion";
+import { MapPin, Zap, Truck, ShieldCheck, Route, Users, BarChart3, CreditCard, Lock, Radio } from "lucide-react";
+import {
+  Reveal,
+  SplitHeading,
+  Eyebrow,
+  TiltCard,
+  PillButton,
+  Marquee,
+} from "@/components/motion/primitives";
 
-/* ─── Lazy R3F Scenes (ssr: false) ─────────────────────────────────── */
-const DynamicCanvas = dynamic(
-  () => import("@/components/3d/DynamicCanvas"),
-  { ssr: false }
-);
-const EcoScene = dynamic(
-  () => import("@/components/3d/EcoScene"),
-  { ssr: false }
-);
-const SmartBinScene = dynamic(
-  () => import("@/components/3d/SmartBinScene"),
-  { ssr: false }
-);
-
-/* ─── Story Step Data ───────────────────────────────────────────────── */
-const STORY_DATA = [
+const STEPS = [
   {
-    id: 0,
     number: "01",
-    tabLabel: "01 Report",
-    badge: "Citizen Ingestion",
-    title: "Citizens Report",
-    body: "Citizens log waste collection requests in seconds. Geolocation and AI image verification validate request priority automatically.",
-    color: "#059669",
-    bgColor: "rgba(5, 150, 105, 0.08)",
-    borderColor: "rgba(5, 150, 105, 0.25)",
-    icon: <MapPin className="h-5 w-5" />,
-    hudLabel: "CITIZEN SUBMISSION",
-    hudDetail: "Request Geo-tagged & Photo Verified",
-    hudLoad: "25%",
+    badge: "Citizen intake",
+    title: "Citizens report",
+    body: "Requests are logged in seconds. Geolocation and photo verification set priority automatically.",
+    icon: MapPin,
+    detail: "Geo-tagged and photo verified",
+    load: 25,
+    tint: "oklch(0.97 0.03 150)",
   },
   {
-    id: 1,
     number: "02",
-    tabLabel: "02 Route",
-    badge: "Intelligent Dispatch",
-    title: "System Routes",
-    body: "Our dispatch engine computes optimal collector routing in real-time, reducing fuel consumption by up to 30% across the smart grid.",
-    color: "#0284c7",
-    bgColor: "rgba(2, 132, 199, 0.08)",
-    borderColor: "rgba(2, 132, 199, 0.25)",
-    icon: <Zap className="h-5 w-5" />,
-    hudLabel: "AI DISPATCH ENGINE",
-    hudDetail: "Multi-point Route Clustered & Scheduled",
-    hudLoad: "50%",
+    badge: "Intelligent dispatch",
+    title: "The system routes",
+    body: "The dispatch engine clusters pickups and computes the leanest collector routes in real time, cutting fuel use by up to 30%.",
+    icon: Zap,
+    detail: "Multi-stop route clustered and scheduled",
+    load: 50,
+    tint: "oklch(0.97 0.04 120)",
   },
   {
-    id: 2,
     number: "03",
-    tabLabel: "03 Execute",
-    badge: "Field Execution",
-    title: "Collectors Execute",
-    body: "Field operators receive live GPS turns, update bin collection statuses on-site, and mark jobs done with instant timestamp verification.",
-    color: "#0d9488",
-    bgColor: "rgba(13, 148, 136, 0.08)",
-    borderColor: "rgba(13, 148, 136, 0.25)",
-    icon: <Truck className="h-5 w-5" />,
-    hudLabel: "FIELD SERVICE OPS",
-    hudDetail: "Collector En Route • Smart Bin Servicing",
-    hudLoad: "75%",
+    badge: "Field execution",
+    title: "Collectors execute",
+    body: "Operators follow live turn-by-turn guidance, update bin status on site and close jobs with timestamped proof.",
+    icon: Truck,
+    detail: "Collector en route, bin being serviced",
+    load: 75,
+    tint: "oklch(0.97 0.035 175)",
   },
   {
-    id: 3,
     number: "04",
-    tabLabel: "04 Monitor",
-    badge: "City Analytics & Audit",
-    title: "Admins Monitor",
-    body: "City supervisors access real-time zone telemetry, KPI reports, and automated billing audits to ensure 99% municipal service reliability.",
-    color: "#d97706",
-    bgColor: "rgba(217, 119, 6, 0.08)",
-    borderColor: "rgba(217, 119, 6, 0.25)",
-    icon: <ShieldCheck className="h-5 w-5" />,
-    hudLabel: "MUNICIPAL CLEARANCE",
-    hudDetail: "Pickup Logged • Compliance KPI Audited",
-    hudLoad: "100%",
+    badge: "City analytics",
+    title: "Admins monitor",
+    body: "Supervisors see live zone telemetry, KPI reports and automated billing audits across the whole municipality.",
+    icon: ShieldCheck,
+    detail: "Pickup logged, compliance audited",
+    load: 100,
+    tint: "oklch(0.96 0.05 100)",
   },
 ];
 
-/* ─── Animated Stat Counter ─────────────────────────────────────────── */
-function StatBadge({ value, label }: { value: string; label: string }) {
+const FEATURES = [
+  { icon: Route, title: "AI-powered routing", body: "Routes adapt to traffic, load and priority so fleets drive less and collect more.", span: "md:col-span-2" },
+  { icon: Users, title: "Citizen engagement", body: "Report, request and track pickups through one transparent portal.", span: "" },
+  { icon: BarChart3, title: "Data analytics", body: "KPI dashboards and automated compliance reports for city administrators.", span: "" },
+  { icon: CreditCard, title: "Seamless payments", body: "Integrated gateway billing with automated invoice management.", span: "md:col-span-2" },
+  { icon: Lock, title: "Role-based access", body: "Citizens, collectors and admins each see exactly what they need.", span: "" },
+  { icon: Radio, title: "Real-time tracking", body: "Status updates flow from field to citizen instantly. No refresh needed.", span: "" },
+];
+
+const STATS = [
+  { value: "50+", label: "Cities partnered" },
+  { value: "10M+", label: "Tons managed" },
+  { value: "99.4%", label: "Grid uptime" },
+  { value: "30%", label: "Efficiency gain" },
+];
+
+const STATEMENT =
+  "We turn the daily chaos of urban waste into a quiet, measurable system where every request is seen, every route is earned and every ton is accounted for.";
+
+function ScrollWord({ word, range, progress }: { word: string; range: [number, number]; progress: MotionValue<number> }) {
+  const opacity = useTransform(progress, range, [0.14, 1]);
+  const y = useTransform(progress, range, [10, 0]);
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="flex flex-col items-center gap-2"
-    >
-      <span className="text-4xl md:text-5xl font-black bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
-        {value}
-      </span>
-      <span className="text-xs md:text-sm font-semibold uppercase tracking-wider text-slate-500">
-        {label}
-      </span>
-    </motion.div>
+    <motion.span style={{ opacity, y }} className="mr-[0.26em] inline-block">
+      {word}
+    </motion.span>
   );
 }
 
-/* ─── Feature Card ──────────────────────────────────────────────────── */
-interface FeatureCardProps {
-  icon: React.ReactNode;
-  title: string;
-  body: string;
-  delay?: number;
-}
-
-function FeatureCard({ icon, title, body, delay = 0 }: FeatureCardProps) {
+function Statement() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.85", "end 0.45"] });
+  const words = STATEMENT.split(" ");
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.5, delay, ease: "easeOut" }}
-      whileHover={{ y: -4 }}
-      className="bg-white rounded-2xl p-7 border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-emerald-300 transition-all flex flex-col gap-4 group"
-    >
-      <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-emerald-50 text-emerald-600 border border-emerald-100 group-hover:scale-105 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300 shadow-sm">
-        {icon}
+    <section className="relative px-6 py-32 md:py-48">
+      <div className="mx-auto max-w-6xl">
+        <Eyebrow>Our approach</Eyebrow>
+        <p ref={ref} className="mt-10 text-3xl font-medium leading-[1.15] tracking-tight md:text-5xl lg:text-6xl">
+          {words.map((w, i) => {
+            const start = i / words.length;
+            const end = start + 1.6 / words.length;
+            return <ScrollWord key={i} word={w} range={[start, Math.min(end, 1)]} progress={scrollYProgress} />;
+          })}
+        </p>
       </div>
-      <h3 className="text-lg font-bold text-slate-900">{title}</h3>
-      <p className="text-sm leading-relaxed text-slate-600">{body}</p>
-    </motion.div>
+    </section>
   );
 }
 
-/* ─── Main Page ─────────────────────────────────────────────────────── */
-export default function ImmersiveLandingPage() {
-  const mounted = useIsMounted();
+function ProgressRing({ value, progress }: { value: number; progress: MotionValue<number> }) {
+  const r = 54;
+  const c = 2 * Math.PI * r;
+  const draw = useTransform(progress, [0, 1], [c, c * (1 - value / 100)]);
+  const count = useTransform(progress, [0, 1], [0, value]);
+  const label = useTransform(count, (v) => `${Math.round(v)}%`);
+  return (
+    <div className="relative flex h-40 w-40 items-center justify-center md:h-52 md:w-52">
+      <svg viewBox="0 0 128 128" className="absolute inset-0 -rotate-90">
+        <circle cx="64" cy="64" r={r} fill="none" stroke="var(--site-line)" strokeWidth="8" />
+        <motion.circle
+          cx="64"
+          cy="64"
+          r={r}
+          fill="none"
+          stroke="var(--site-accent)"
+          strokeWidth="8"
+          strokeLinecap="round"
+          strokeDasharray={c}
+          style={{ strokeDashoffset: draw }}
+        />
+      </svg>
+      <div className="text-center">
+        <motion.div className="text-4xl font-semibold tracking-tight md:text-5xl">{label}</motion.div>
+        <div className="mt-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Workflow</div>
+      </div>
+    </div>
+  );
+}
 
-  const heroRef = useRef<HTMLDivElement>(null);
-  const storyRef = useRef<HTMLDivElement>(null);
+function StackCard({
+  step,
+  index,
+  total,
+  progress,
+}: {
+  step: (typeof STEPS)[number];
+  index: number;
+  total: number;
+  progress: MotionValue<number>;
+}) {
+  const reduce = useReducedMotion();
+  const Icon = step.icon;
+  const enterStart = index === 0 ? 0 : (index - 1) / total;
+  const enterEnd = index === 0 ? 0.0001 : index / total;
+  const leaveStart = index / total;
+  const leaveEnd = (index + 1) / total;
 
-  /* Active step tracking (0, 1, 2, 3) */
-  const [activeStepIndex, setActiveStepIndex] = useState(0);
-
-  /* Hero parallax: smooth hardware-accelerated transforms without spring desync */
-  const { scrollYProgress: heroScroll } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
-  const heroY       = useTransform(heroScroll, [0, 1], [0, 140]);
-  const heroOpacity = useTransform(heroScroll, [0, 0.75], [1, 0]);
-  const heroCanvasY = useTransform(heroScroll, [0, 1], [0, 70]);
-
-  /* Scroll-driven story (300vh) */
-  const { scrollYProgress: storyScroll } = useScroll({
-    target: storyRef,
-    offset: ["start start", "end end"],
-  });
-
-  const binFillSmooth = useSpring(storyScroll, { stiffness: 120, damping: 20 });
-
-  /* Update active step strictly without ghost overlaps */
-  useEffect(() => {
-    return storyScroll.on("change", (latest) => {
-      if (latest < 0.25) setActiveStepIndex(0);
-      else if (latest < 0.50) setActiveStepIndex(1);
-      else if (latest < 0.75) setActiveStepIndex(2);
-      else setActiveStepIndex(3);
-    });
-  }, [storyScroll]);
-
-  const scrollToStep = (targetRatio: number) => {
-    if (!storyRef.current) return;
-    const rect = storyRef.current.getBoundingClientRect();
-    const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    const sectionStart = rect.top + scrollTop;
-    const totalScrollable = storyRef.current.offsetHeight - window.innerHeight;
-    const targetY = sectionStart + totalScrollable * targetRatio;
-    window.scrollTo({ top: targetY, behavior: "smooth" });
-  };
-
-  const currentStep = STORY_DATA[activeStepIndex];
+  const rawY = useTransform(progress, [enterStart, enterEnd], [index === 0 ? 0 : 108, 0]);
+  const y = useTransform(rawY, (v) => `${v}%`);
+  const rotateX = useTransform(progress, [leaveStart, leaveEnd], [0, reduce ? 0 : -7]);
+  const scale = useTransform(progress, [leaveStart, leaveEnd], [1, reduce ? 1 : 0.92]);
+  const veil = useTransform(progress, [leaveStart, leaveEnd], [0, 0.5]);
+  const lift = useTransform(progress, [leaveStart, leaveEnd], [0, -24]);
+  const ringProgress = useTransform(progress, [enterStart, enterEnd + 0.04], [0, 1], { clamp: true });
 
   return (
-    <main className="flex flex-col min-h-full bg-white text-slate-900 overflow-x-clip">
+    <motion.article
+      style={{ y, rotateX, scale, translateY: lift, zIndex: index, transformOrigin: "50% 0%" }}
+      className="absolute inset-0 overflow-hidden rounded-[2rem] border border-[var(--site-line)] shadow-[0_40px_80px_-40px_oklch(0.3_0.06_160/0.4)]"
+    >
+      <div className="absolute inset-0" style={{ background: step.tint }} />
+      <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[var(--site-lime)] opacity-30 blur-3xl" />
+      <div className="relative grid h-full gap-6 p-7 md:grid-cols-[1.2fr_1fr] md:gap-10 md:p-12">
+        <div className="flex flex-col justify-between gap-6">
+          <div className="flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-[var(--site-accent)] shadow-sm">
+              <Icon className="h-5 w-5" />
+            </span>
+            <span className="rounded-full border border-[var(--site-line)] bg-white/70 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.2em] text-[var(--site-accent)]">
+              {step.badge}
+            </span>
+          </div>
+          <div>
+            <h3 className="text-3xl font-semibold tracking-tight md:text-5xl">{step.title}</h3>
+            <p className="mt-4 max-w-md text-base leading-relaxed text-muted-foreground">{step.body}</p>
+          </div>
+          <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">{step.detail}</p>
+        </div>
+        <div className="flex flex-col items-center justify-center gap-4">
+          <ProgressRing value={step.load} progress={ringProgress} />
+          <span className="text-7xl font-semibold leading-none tracking-tighter text-outline md:text-8xl">{step.number}</span>
+        </div>
+      </div>
+      <motion.div style={{ opacity: veil }} className="pointer-events-none absolute inset-0 bg-[var(--background)]" />
+    </motion.article>
+  );
+}
 
-      {/* ══════════════════════════════════════════════════════════════
-          HERO — Modern Light 3D Canvas
-      ══════════════════════════════════════════════════════════════ */}
-      <section
-        ref={heroRef}
-        className="relative flex items-center justify-center min-h-[100dvh] overflow-hidden pt-16 bg-gradient-to-b from-slate-50 via-white to-slate-50"
-      >
-        {/* Soft background ambient glow blobs */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-emerald-200/30 rounded-full blur-3xl opacity-70" />
-          <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-teal-200/30 rounded-full blur-3xl opacity-60" />
-          <div className="absolute bottom-10 left-1/4 w-[500px] h-[300px] bg-cyan-100/40 rounded-full blur-3xl opacity-60" />
+function Story() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.4 });
+  const rail = useTransform(progress, [0, 1], ["0%", "100%"]);
+
+  return (
+    <section id="story" ref={ref} className="relative" style={{ height: "420vh" }}>
+      <div className="sticky top-0 flex h-screen flex-col justify-center gap-8 overflow-hidden px-6 pt-24 lg:flex-row lg:items-center lg:gap-16 lg:px-16">
+        <div className="pointer-events-none absolute inset-0 site-grid opacity-70" />
+
+        <div className="relative z-10 flex flex-col gap-6 lg:w-[34%]">
+          <Eyebrow>How it works</Eyebrow>
+          <SplitHeading
+            text="From report to resolution"
+            accentWords={["resolution"]}
+            className="text-4xl font-semibold md:text-6xl"
+          />
+          <div className="hidden items-center gap-4 lg:flex">
+            <div className="relative h-1 w-full overflow-hidden rounded-full bg-[var(--site-line)]">
+              <motion.div style={{ width: rail }} className="h-full rounded-full bg-[var(--site-accent)]" />
+            </div>
+            <span className="font-mono text-xs text-muted-foreground">04</span>
+          </div>
         </div>
 
-        {/* 3D Canvas with smooth depth parallax */}
-        {mounted && (
-          <motion.div
-            style={{ y: heroCanvasY }}
-            className="absolute inset-0 z-0 hidden md:block pointer-events-none"
-          >
-            <DynamicCanvas camera={{ position: [0, 0, 7], fov: 55 }}>
-              <EcoScene />
-            </DynamicCanvas>
-          </motion.div>
-        )}
-
-        {/* Hero Content — hardware accelerated, zero spring desync */}
-        <motion.div
-          style={{ y: heroY, opacity: heroOpacity }}
-          className="relative z-10 flex flex-col items-center justify-center text-center px-4 max-w-5xl mx-auto gap-7 will-change-transform"
-        >
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2.5 bg-emerald-50 border border-emerald-200/80 rounded-full px-4 py-1.5 text-xs font-bold text-emerald-800 shadow-xs">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" />
-            </span>
-            EcoWaste Platform v2.0 • Live
+        <div className="perspective-1200 relative z-10 h-[62vh] w-full lg:h-[68vh] lg:flex-1">
+          <div className="relative h-full w-full preserve-3d">
+            {STEPS.map((s, i) => (
+              <StackCard key={s.number} step={s} index={i} total={STEPS.length} progress={progress} />
+            ))}
           </div>
-
-          {/* Headline */}
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.0] text-slate-900">
-            Smarter Waste <br />
-            <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
-              for Sustainable Cities
-            </span>
-          </h1>
-
-          {/* Subtext */}
-          <p className="max-w-xl text-base md:text-lg text-slate-600 leading-relaxed font-normal">
-            Connect citizens, empower collectors, and streamline urban field service
-            operations with an intelligent, data-driven platform.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 mt-1">
-            <Link href="/register">
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-600/25 transition-all"
-              >
-                Get Started Free <ArrowRight className="h-4 w-4" />
-              </motion.button>
-            </Link>
-            <Link href="#story">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-bold text-slate-700 bg-white border border-slate-200/90 hover:bg-slate-50 shadow-xs transition-all"
-              >
-                See How It Works
-              </motion.button>
-            </Link>
-          </div>
-        </motion.div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.0, duration: 0.5 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 text-slate-400"
-        >
-          <motion.div
-            animate={{ y: [0, 6, 0] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <ArrowDown className="h-4 w-4 text-emerald-600" />
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════
-          STATS BAND
-      ══════════════════════════════════════════════════════════════ */}
-      <section className="py-16 bg-slate-50/80 border-y border-slate-200/70">
-        <div className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
-          <StatBadge value="50+" label="Cities Partnered" />
-          <StatBadge value="10M+" label="Tons Managed" />
-          <StatBadge value="99.4%" label="Grid Uptime" />
-          <StatBadge value="30%" label="Efficiency Boost" />
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      {/* ══════════════════════════════════════════════════════════════
-          SCROLLYTELLING STORY — Clean Light Studio
-      ══════════════════════════════════════════════════════════════ */}
-      <section
-        id="story"
-        ref={storyRef}
-        className="relative bg-gradient-to-b from-slate-50 via-white to-slate-50"
-        style={{ height: "300vh" }}
-      >
-        {/* Sticky viewport frame */}
-        <div className="sticky top-0 h-screen w-full flex flex-col md:flex-row items-center justify-between overflow-hidden px-4 md:px-12 lg:px-20 py-8">
+export default function LandingPage() {
+  const reduce = useReducedMotion();
+  const heroRef = useRef<HTMLElement>(null);
 
-          {/* Left Column — 3D Smart Bin with Studio Lighting & Live Telemetry HUD */}
-          <div className="w-full md:w-1/2 flex flex-col items-center justify-center relative h-[48%] md:h-full">
-            {/* Soft backdrop radial light */}
-            <div
-              className="absolute inset-0 pointer-events-none transition-colors duration-700"
-              style={{
-                background: `radial-gradient(ellipse 65% 65% at 50% 50%, ${currentStep.bgColor} 0%, transparent 70%)`,
-              }}
-            />
+  const { scrollYProgress: heroScroll } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const textY = useTransform(heroScroll, [0, 1], [0, reduce ? 0 : 160]);
+  const textOpacity = useTransform(heroScroll, [0, 0.7], [1, 0]);
+  const statsY = useTransform(heroScroll, [0, 1], [0, reduce ? 0 : 80]);
+  const orbA = useTransform(heroScroll, [0, 1], [0, reduce ? 0 : -140]);
+  const orbB = useTransform(heroScroll, [0, 1], [0, reduce ? 0 : 200]);
 
-            {/* Section Tag */}
-            <div className="absolute top-2 left-2 md:top-6 md:left-6 z-10">
-              <span
-                className="text-xs font-bold uppercase tracking-wider bg-white/90 border border-slate-200/80 rounded-full px-4 py-1.5 flex items-center gap-2 shadow-xs"
-                style={{ color: currentStep.color }}
-              >
-                <span className="w-2 h-2 rounded-full animate-ping" style={{ background: currentStep.color }} />
-                Interactive Scrollytelling
+  return (
+    <main className="relative flex flex-col overflow-x-clip">
+      <section ref={heroRef} className="relative flex min-h-[100dvh] items-center overflow-hidden px-6 pb-24 pt-32 site-grain">
+        <div className="pointer-events-none absolute inset-0 site-grid" />
+        <motion.div
+          style={{ y: orbA }}
+          className="pointer-events-none absolute -left-32 top-1/4 h-[460px] w-[460px] rounded-full bg-[var(--site-lime)] opacity-40 blur-[110px]"
+        />
+        <motion.div
+          style={{ y: orbB }}
+          className="pointer-events-none absolute -right-24 top-10 h-[520px] w-[520px] rounded-full bg-[oklch(0.85_0.12_175)] opacity-40 blur-[120px]"
+        />
+
+        <motion.div style={{ y: textY, opacity: textOpacity }} className="relative z-10 mx-auto w-full max-w-7xl">
+          <Reveal y={20}>
+            <span className="site-glass inline-flex items-center gap-2.5 rounded-full px-4 py-1.5 text-xs font-medium">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--site-accent)] opacity-70" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--site-accent)]" />
               </span>
-            </div>
+              Platform v2.0 is live
+            </span>
+          </Reveal>
 
-            {/* 3D Smart Bin Canvas */}
-            {mounted && (
-              <div className="w-full h-full max-h-[320px] md:max-h-[500px]">
-                <DynamicCanvas camera={{ position: [0, 0, 5], fov: 48 }}>
-                  <SmartBinScene fillProgress={binFillSmooth} />
-                </DynamicCanvas>
-              </div>
-            )}
+          <SplitHeading
+            as="h1"
+            text="Smarter waste for sustainable cities"
+            accentWords={["sustainable", "cities"]}
+            delay={0.15}
+            className="mt-8 max-w-5xl text-5xl font-semibold sm:text-6xl md:text-7xl lg:text-[7.5rem]"
+          />
 
-            {/* Live Telemetry HUD */}
-            <div className="w-full max-w-sm bg-white/95 backdrop-blur-md rounded-2xl p-4 flex flex-col gap-2 z-10 mt-1 md:mt-2 border border-slate-200/90 shadow-md">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-mono tracking-wider font-bold" style={{ color: currentStep.color }}>
-                  {currentStep.hudLabel}
-                </span>
-                <span className="font-mono font-bold text-slate-800">
-                  CAPACITY: {currentStep.hudLoad}
-                </span>
-              </div>
-              {/* Progress bar */}
-              <div className="w-full h-2 rounded-full overflow-hidden bg-slate-100 border border-slate-200/60">
-                <motion.div
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{
-                    width: currentStep.hudLoad,
-                    background: `linear-gradient(90deg, #0284c7, ${currentStep.color})`,
-                  }}
-                />
-              </div>
-              <p className="text-xs font-medium text-slate-500 truncate">
-                {currentStep.hudDetail}
+          <div className="mt-10 flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
+            <Reveal delay={0.5} className="max-w-md">
+              <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
+                Connect citizens, empower collectors and run urban field service on one intelligent, data-driven platform.
               </p>
+              <div className="mt-8 flex flex-wrap items-center gap-4">
+                <PillButton href="/register">Get started free</PillButton>
+                <PillButton href="/#story" variant="ghost">
+                  See how it works
+                </PillButton>
+              </div>
+            </Reveal>
+
+            <motion.div style={{ y: statsY }} className="site-glass grid grid-cols-2 gap-x-10 gap-y-6 rounded-3xl p-7 md:min-w-[380px]">
+              {STATS.map((s) => (
+                <div key={s.label}>
+                  <div className="text-3xl font-semibold tracking-tight text-[var(--site-accent)] md:text-4xl">{s.value}</div>
+                  <div className="mt-1 text-xs uppercase tracking-[0.16em] text-muted-foreground">{s.label}</div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </motion.div>
+      </section>
+
+      <Marquee items={["Smart routing", "Live tracking", "Zero waste", "Citizen first", "Verified pickups", "Clean cities"]} />
+
+      <Statement />
+
+      <Story />
+
+      <section id="features" className="relative px-6 py-32 md:py-44">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div className="flex flex-col gap-6">
+              <Eyebrow>Capabilities</Eyebrow>
+              <SplitHeading
+                text="Everything a smart city needs"
+                accentWords={["smart", "city"]}
+                className="max-w-3xl text-4xl font-semibold md:text-6xl"
+              />
             </div>
+            <Reveal delay={0.2} className="max-w-sm">
+              <p className="text-muted-foreground">
+                One unified platform connecting citizens, field teams and municipal administrators in real time.
+              </p>
+            </Reveal>
           </div>
 
-          {/* Right Column — Narrative Step Card (Physically impossible to overlap) */}
-          <div className="w-full md:w-1/2 flex flex-col items-center justify-center px-2 md:px-8 py-2 md:py-0 relative h-[52%] md:h-full">
-            <div className="w-full max-w-md flex flex-col gap-5">
-
-              {/* Step Navigation Tabs */}
-              <div className="flex items-center justify-between bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 w-full shadow-inner">
-                {STORY_DATA.map((s, idx) => {
-                  const isActive = activeStepIndex === idx;
-                  return (
-                    <button
-                      key={s.id}
-                      onClick={() => scrollToStep((idx + 0.1) / 4)}
-                      className="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all relative"
-                      style={{
-                        color: isActive ? "#0f172a" : "#64748b",
-                      }}
-                    >
-                      {isActive && (
-                        <motion.div
-                          layoutId="active-step-tab-white"
-                          className="absolute inset-0 bg-white rounded-xl shadow-xs -z-10 border border-slate-200/70"
-                          transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                        />
-                      )}
-                      {s.tabLabel}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Step Card Container with AnimatePresence: guarantees single visible card */}
-              <div className="relative w-full min-h-[280px]">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeStepIndex}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -16 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="w-full bg-white/95 backdrop-blur-xl rounded-3xl p-7 md:p-8 border border-slate-200/90 shadow-[0_20px_50px_rgba(0,0,0,0.06)] flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-4">
-                        <span
-                          className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full"
-                          style={{
-                            background: currentStep.bgColor,
-                            color: currentStep.color,
-                            border: `1px solid ${currentStep.borderColor}`,
-                          }}
-                        >
-                          {currentStep.badge}
+          <div className="mt-16 grid gap-5 md:grid-cols-3">
+            {FEATURES.map((f, i) => {
+              const Icon = f.icon;
+              return (
+                <Reveal key={f.title} delay={(i % 3) * 0.08} className={f.span}>
+                  <TiltCard className="h-full min-h-[240px] p-8">
+                    <div className="flex h-full flex-col justify-between gap-12">
+                      <div className="flex items-start justify-between">
+                        <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--site-line)] bg-[var(--site-accent-soft)] text-[var(--site-accent)] transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110">
+                          <Icon className="h-5 w-5" />
                         </span>
-                        <div
-                          className="w-10 h-10 rounded-xl flex items-center justify-center shadow-xs"
-                          style={{
-                            background: currentStep.bgColor,
-                            color: currentStep.color,
-                          }}
-                        >
-                          {currentStep.icon}
-                        </div>
+                        <span className="font-mono text-xs text-muted-foreground">0{i + 1}</span>
                       </div>
-
-                      <div className="text-4xl md:text-5xl font-black mb-2 tracking-tight" style={{ color: currentStep.color }}>
-                        {currentStep.number}
+                      <div>
+                        <h3 className="text-xl font-semibold tracking-tight">{f.title}</h3>
+                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.body}</p>
                       </div>
-                      <h3 className="text-2xl font-bold text-slate-900 mb-2">{currentStep.title}</h3>
-                      <p className="text-sm md:text-base leading-relaxed text-slate-600">
-                        {currentStep.body}
-                      </p>
                     </div>
-
-                    <div className="pt-5 mt-4 border-t border-slate-100 flex items-center justify-between">
-                      <span className="text-xs font-mono text-slate-400">
-                        EcoWaste Grid • Step {activeStepIndex + 1} of 4
-                      </span>
-                      <span className="text-xs font-bold flex items-center gap-1.5" style={{ color: currentStep.color }}>
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        Live Synchronized
-                      </span>
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-
-              {/* Scroll prompt */}
-              <div className="flex items-center justify-between text-xs px-2 text-slate-400 font-medium">
-                <span>Scroll to drive narrative</span>
-                <span>Click tabs to jump</span>
-              </div>
-            </div>
+                  </TiltCard>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════
-          FEATURES GRID
-      ══════════════════════════════════════════════════════════════ */}
-      <section id="features" className="py-28 px-6 bg-slate-50/70 border-t border-slate-200/80">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16 flex flex-col items-center gap-4">
-            <motion.span
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200 px-3.5 py-1 rounded-full"
-            >
-              Platform Capabilities
-            </motion.span>
-            <motion.h2
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight"
-            >
-              Everything a Smart City Needs
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.15 }}
-              className="max-w-xl text-base text-slate-600"
-            >
-              A single unified platform connecting citizens, field teams, and municipal administrators in real-time.
-            </motion.p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <FeatureCard
-              delay={0}
-              icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" /></svg>}
-              title="AI-Powered Routing"
-              body="Optimise collector routes in real-time based on traffic, load capacity, and priority reports to slash fuel consumption."
-            />
-            <FeatureCard
-              delay={0.1}
-              icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>}
-              title="Citizen Engagement"
-              body="Allow citizens to report issues, request special pickups, and track resolution status transparently through a unified portal."
-            />
-            <FeatureCard
-              delay={0.2}
-              icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>}
-              title="Data Analytics"
-              body="Comprehensive dashboards for city admins to track KPIs, monitor sustainability goals, and generate automated compliance reports."
-            />
-            <FeatureCard
-              delay={0.3}
-              icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>}
-              title="Seamless Payments"
-              body="Integrated SSLCommerz payment gateway for frictionless waste service billing and automated invoice management."
-            />
-            <FeatureCard
-              delay={0.4}
-              icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>}
-              title="Role-Based Access"
-              body="Granular permission control for Citizens, Collectors, and Admins — every user sees exactly what they need."
-            />
-            <FeatureCard
-              delay={0.5}
-              icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>}
-              title="Real-Time Tracking"
-              body="Live status updates propagate instantly from field collectors back to citizens and admins — zero manual refresh needed."
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════
-          CTA SECTION
-      ══════════════════════════════════════════════════════════════ */}
-      <section className="py-24 px-6 relative overflow-hidden bg-white">
-        <div className="max-w-4xl mx-auto relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.6 }}
-            className="rounded-3xl p-10 md:p-16 text-center flex flex-col items-center gap-7 bg-gradient-to-tr from-emerald-600 via-emerald-600 to-teal-600 text-white shadow-2xl shadow-emerald-600/20"
-          >
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-white/15 border border-white/20 shadow-md">
-              <Leaf className="w-8 h-8 text-white" />
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <h2 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
-                Ready for a Cleaner City?
-              </h2>
-              <p className="text-base md:text-lg max-w-lg mx-auto text-emerald-50">
-                Join thousands of citizens and municipalities already building a sustainable future with EcoWaste.
+      <section className="px-6 pb-32">
+        <Reveal y={60} className="mx-auto max-w-7xl">
+          <div className="site-glass site-grain relative overflow-hidden rounded-[2.5rem] px-8 py-20 text-center md:px-20 md:py-28">
+            <div className="pointer-events-none absolute left-1/2 top-0 h-80 w-[700px] -translate-x-1/2 rounded-full bg-[var(--site-lime)] opacity-40 blur-[110px]" />
+            <div className="relative z-10 flex flex-col items-center gap-8">
+              <Eyebrow>Join EcoWaste</Eyebrow>
+              <SplitHeading
+                text="Ready for a cleaner city?"
+                accentWords={["cleaner", "city?"]}
+                className="justify-center text-4xl font-semibold md:text-7xl"
+              />
+              <p className="max-w-lg text-muted-foreground">
+                Join thousands of citizens and municipalities building a sustainable future together.
               </p>
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                <PillButton href="/register">Create free account</PillButton>
+                <PillButton href="/contact" variant="ghost">
+                  Contact sales
+                </PillButton>
+              </div>
             </div>
-
-            <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
-              <Link href="/register">
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="px-8 py-3.5 rounded-full text-sm font-bold bg-white text-emerald-800 shadow-lg hover:bg-emerald-50 transition-all"
-                >
-                  Create Free Account
-                </motion.button>
-              </Link>
-              <Link href="/contact">
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="px-8 py-3.5 rounded-full text-sm font-bold text-white border border-white/30 hover:bg-white/10 transition-all"
-                >
-                  Contact Sales
-                </motion.button>
-              </Link>
-            </div>
-          </motion.div>
-        </div>
+          </div>
+        </Reveal>
       </section>
-
     </main>
   );
 }
