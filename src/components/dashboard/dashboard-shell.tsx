@@ -17,7 +17,6 @@ export function DashboardShell({ children }: { children: ReactNode }) {
     <SidebarProvider>
       <DashboardSidebar role={role} />
       <SidebarInset>
-        {/* Top bar */}
         <header
           className="flex h-14 shrink-0 items-center gap-3 border-b px-4"
           style={{

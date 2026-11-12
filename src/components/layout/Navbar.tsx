@@ -2,209 +2,177 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { Menu, X, Leaf } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
 import { useAuthStore } from "@/store/auth.store";
-import { useRouter } from "next/navigation";
+import { PillButton, EASE_OUT } from "@/components/motion/primitives";
 
 const NAV_LINKS = [
-  { name: "How It Works", href: "/#story" },
+  { name: "How it works", href: "/#story" },
   { name: "Features", href: "/#features" },
-  { name: "About Us", href: "/about" },
+  { name: "About", href: "/about" },
   { name: "Sustainability", href: "/sustainability" },
+  { name: "Contact", href: "/contact" },
 ];
 
 export function Navbar() {
-  const [isScrolled, setIsScrolled] = React.useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
+  const [hidden, setHidden] = React.useState(false);
+  const [scrolled, setScrolled] = React.useState(false);
   const { isAuthenticated, logout } = useAuthStore();
   const router = useRouter();
+  const pathname = usePathname();
+  const { scrollY } = useScroll();
+
+  useMotionValueEvent(scrollY, "change", (y) => {
+    const prev = scrollY.getPrevious() ?? 0;
+    setScrolled(y > 24);
+    setHidden(y > prev && y > 240 && !open);
+  });
+
+  React.useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
 
   const handleLogout = () => {
     logout();
     router.push("/");
   };
 
-  React.useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
     <>
       <motion.header
-        initial={{ y: -80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled
-            ? "bg-white/80 backdrop-blur-md border-b border-slate-200/80 shadow-sm"
-            : "bg-white/40 backdrop-blur-sm border-b border-slate-100/60"
-        }`}
+        initial={{ y: -90, opacity: 0 }}
+        animate={{ y: hidden ? -110 : 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: EASE_OUT }}
+        className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4"
       >
-        <div className="max-w-7xl mx-auto px-6 flex h-16 items-center justify-between">
-
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <motion.div
-              whileHover={{ rotate: 10, scale: 1.08 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              className="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-tr from-emerald-600 to-teal-500 shadow-md shadow-emerald-500/20"
-            >
-              <Leaf className="w-5 h-5 text-white" />
-            </motion.div>
-            <span className="text-xl font-black text-slate-900 tracking-tight">EcoWaste</span>
+        <div
+          className={`flex h-14 w-full max-w-6xl items-center justify-between rounded-full pl-5 pr-2 transition-all duration-500 ${
+            scrolled ? "site-glass bg-white/70" : "border border-transparent"
+          }`}
+        >
+          <Link href="/" className="group flex items-center gap-2.5" aria-label="EcoWaste home">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--site-accent)] text-white transition-transform duration-500 group-hover:rotate-[360deg]">
+              <Leaf className="h-4 w-4" />
+            </span>
+            <span className="text-lg font-semibold tracking-tight">EcoWaste</span>
           </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors duration-200"
-              >
-                {link.name}
-              </Link>
-            ))}
+          <nav className="hidden items-center gap-1 lg:flex">
+            {NAV_LINKS.map((link) => {
+              const current = pathname === link.href;
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="group relative rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors duration-300 hover:text-foreground"
+                >
+                  {link.name}
+                  <span
+                    className={`absolute inset-x-4 bottom-1 h-px origin-left bg-[var(--site-accent)] transition-transform duration-500 ${
+                      current ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                    }`}
+                  />
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden items-center gap-2 lg:flex">
             {isAuthenticated ? (
               <>
-                <Link href="/dashboard">
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="px-4 py-2 rounded-full text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 transition-all"
-                  >
-                    Dashboard
-                  </motion.button>
-                </Link>
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
+                <button
                   onClick={handleLogout}
-                  className="px-4 py-2 rounded-full text-sm font-semibold border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-all"
+                  className="min-h-11 rounded-full px-4 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                 >
                   Log out
-                </motion.button>
+                </button>
+                <PillButton href="/dashboard">Dashboard</PillButton>
               </>
             ) : (
               <>
-                <Link href="/login">
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="px-4 py-2 rounded-full text-sm font-semibold text-slate-700 hover:text-slate-950 transition-all"
-                  >
-                    Log in
-                  </motion.button>
+                <Link
+                  href="/login"
+                  className="flex min-h-11 items-center rounded-full px-4 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  Log in
                 </Link>
-                <Link href="/register">
-                  <motion.button
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="px-5 py-2 rounded-full text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/25 transition-all"
-                  >
-                    Get Started
-                  </motion.button>
-                </Link>
+                <PillButton href="/register">Get started</PillButton>
               </>
             )}
           </div>
 
-          {/* Mobile Menu Toggle */}
           <button
-            className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 text-slate-700 border border-slate-200"
-            onClick={() => setIsMobileMenuOpen((v) => !v)}
-            aria-label="Toggle menu"
+            className="site-glass flex h-11 w-11 items-center justify-center rounded-full lg:hidden"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
           >
-            {isMobileMenuOpen
-              ? <X className="h-5 w-5 text-slate-900" />
-              : <Menu className="h-5 w-5 text-slate-900" />
-            }
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </motion.header>
 
-      {/* Mobile Menu Drawer */}
       <AnimatePresence>
-        {isMobileMenuOpen && (
+        {open && (
           <motion.div
-            initial={{ opacity: 0, x: "100%" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "100%" }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed inset-y-0 right-0 z-40 w-72 bg-white border-l border-slate-200 flex flex-col pt-20 pb-8 px-6 gap-8 shadow-2xl"
+            initial={{ clipPath: "circle(0% at calc(100% - 40px) 40px)" }}
+            animate={{ clipPath: "circle(150% at calc(100% - 40px) 40px)" }}
+            exit={{ clipPath: "circle(0% at calc(100% - 40px) 40px)" }}
+            transition={{ duration: 0.7, ease: EASE_OUT }}
+            className="fixed inset-0 z-40 flex flex-col justify-between bg-[var(--background)] px-8 pb-10 pt-28 lg:hidden"
           >
-            <nav className="flex flex-col gap-5">
+            <nav className="flex flex-col gap-2">
               {NAV_LINKS.map((link, i) => (
                 <motion.div
                   key={link.name}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 + i * 0.07, duration: 0.6, ease: EASE_OUT }}
                 >
                   <Link
                     href={link.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-lg font-bold text-slate-800 hover:text-emerald-600 transition-colors"
+                    onClick={() => setOpen(false)}
+                    className="block py-2 text-4xl font-semibold tracking-tight transition-colors hover:text-[var(--site-accent)]"
                   >
                     {link.name}
                   </Link>
                 </motion.div>
               ))}
             </nav>
-
-            <div className="flex flex-col gap-3 mt-auto">
+            <div className="flex flex-wrap gap-3">
               {isAuthenticated ? (
                 <>
-                  <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-                    <button className="w-full py-3 rounded-full text-sm font-bold bg-slate-100 text-slate-900">
-                      Dashboard
-                    </button>
-                  </Link>
+                  <PillButton href="/dashboard" onClick={() => setOpen(false)}>
+                    Dashboard
+                  </PillButton>
                   <button
-                    onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
-                    className="w-full py-3 rounded-full text-sm font-semibold border border-slate-200 text-slate-600"
+                    onClick={() => {
+                      handleLogout();
+                      setOpen(false);
+                    }}
+                    className="min-h-11 rounded-full border border-[var(--site-line)] px-6 text-sm font-medium"
                   >
                     Log out
                   </button>
                 </>
               ) : (
                 <>
-                  <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                    <button className="w-full py-3 rounded-full text-sm font-semibold border border-slate-200 text-slate-700">
-                      Log in
-                    </button>
-                  </Link>
-                  <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                    <button
-                      className="w-full py-3 rounded-full text-sm font-bold text-white bg-emerald-600 shadow-md shadow-emerald-600/25"
-                    >
-                      Get Started
-                    </button>
-                  </Link>
+                  <PillButton href="/register" onClick={() => setOpen(false)}>
+                    Get started
+                  </PillButton>
+                  <PillButton href="/login" variant="ghost" onClick={() => setOpen(false)}>
+                    Log in
+                  </PillButton>
                 </>
               )}
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Mobile overlay */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-30 md:hidden bg-slate-900/40 backdrop-blur-xs"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
         )}
       </AnimatePresence>
     </>

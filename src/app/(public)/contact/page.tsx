@@ -1,33 +1,43 @@
+import { PageHero } from "@/components/layout/PageShell";
 import { MaxWidthWrapper } from "@/components/layout/MaxWidthWrapper";
-import { Button } from "@/components/ui/button";
+import { Reveal } from "@/components/motion/primitives";
+
+const FIELD =
+  "min-h-12 w-full rounded-2xl border border-[var(--site-line)] bg-white/70 px-4 text-sm outline-none transition-all duration-300 placeholder:text-muted-foreground/60 focus:border-[var(--site-accent)] focus:bg-white focus:ring-4 focus:ring-[var(--site-accent-soft)]";
 
 export default function ContactPage() {
   return (
-    <MaxWidthWrapper className="py-24">
-      <div className="max-w-xl mx-auto space-y-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Contact Us</h1>
-          <p className="text-lg text-muted-foreground">
-            Interested in deploying EcoWaste in your city? Reach out to our team.
-          </p>
-        </div>
-        
-        <form className="space-y-6 mt-8 p-8 border rounded-3xl bg-card shadow-soft dark:shadow-soft-dark">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Name</label>
-            <input type="text" className="w-full h-10 px-3 rounded-md border bg-background" placeholder="Jane Doe" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Email</label>
-            <input type="email" className="w-full h-10 px-3 rounded-md border bg-background" placeholder="jane@example.com" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Message</label>
-            <textarea className="w-full p-3 rounded-md border bg-background min-h-[120px]" placeholder="How can we help?"></textarea>
-          </div>
-          <Button className="w-full" size="lg">Send Message</Button>
-        </form>
-      </div>
-    </MaxWidthWrapper>
+    <>
+      <PageHero
+        eyebrow="Contact"
+        title="Let's talk about your city"
+        accentWords={["your", "city"]}
+        lead="Interested in deploying EcoWaste in your city? Reach out to our team."
+      />
+      <MaxWidthWrapper className="pb-32">
+        <Reveal className="mx-auto max-w-2xl">
+          <form className="site-glass flex flex-col gap-6 rounded-3xl p-8 md:p-10">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="name" className="text-sm font-medium">Name</label>
+              <input id="name" type="text" className={FIELD} placeholder="Jane Doe" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="email" className="text-sm font-medium">Email</label>
+              <input id="email" type="email" className={FIELD} placeholder="jane@example.com" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="message" className="text-sm font-medium">Message</label>
+              <textarea id="message" className={`${FIELD} min-h-36 py-3`} placeholder="How can we help?" />
+            </div>
+            <button
+              type="submit"
+              className="min-h-12 rounded-full bg-[var(--site-accent)] px-8 text-sm font-semibold text-white transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Send message
+            </button>
+          </form>
+        </Reveal>
+      </MaxWidthWrapper>
+    </>
   );
 }
