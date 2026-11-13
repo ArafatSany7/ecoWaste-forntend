@@ -5,6 +5,7 @@ export default function RegisterPage() {
   return (
     <AuthSplit
       formSide="right"
+      scene="truck"
       headline="Join the network making waste smarter."
       sub="Create a free account to report waste, follow collectors live and see your impact."
     >

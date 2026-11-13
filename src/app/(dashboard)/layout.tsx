@@ -4,10 +4,10 @@ import { ReactNode } from "react";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <AuthGuard>
-      <DashboardShell>
-        {children}
-      </DashboardShell>
-    </AuthGuard>
+    <div className="site min-h-screen">
+      <AuthGuard>
+        <DashboardShell>{children}</DashboardShell>
+      </AuthGuard>
+    </div>
   );
 }

@@ -18,7 +18,6 @@ const NAV_LINKS = [
 
 export function Navbar() {
   const [open, setOpen] = React.useState(false);
-  const [hidden, setHidden] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
   const { isAuthenticated, logout } = useAuthStore();
   const router = useRouter();
@@ -26,9 +25,7 @@ export function Navbar() {
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, "change", (y) => {
-    const prev = scrollY.getPrevious() ?? 0;
     setScrolled(y > 24);
-    setHidden(y > prev && y > 240 && !open);
   });
 
   React.useEffect(() => {
@@ -47,17 +44,26 @@ export function Navbar() {
     <>
       <motion.header
         initial={{ y: -90, opacity: 0 }}
-        animate={{ y: hidden ? -110 : 0, opacity: 1 }}
+        animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: EASE_OUT }}
-        className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4"
+        className={`fixed inset-x-0 top-0 z-50 flex justify-center transition-[padding] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          scrolled ? "px-4 pt-3" : "px-0 pt-0"
+        }`}
       >
         <div
-          className={`flex h-14 w-full max-w-6xl items-center justify-between rounded-full pl-5 pr-2 transition-all duration-500 ${
-            scrolled ? "site-glass bg-white/70" : "border border-transparent"
+          className={`w-full border backdrop-blur-xl backdrop-saturate-150 transition-[max-width,border-radius,background-color,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            scrolled
+              ? "max-w-5xl rounded-[28px] border-[var(--site-line)] bg-white/70 shadow-[0_12px_40px_-16px_oklch(0.3_0.06_160/0.3)]"
+              : "max-w-[100vw] rounded-none border-transparent border-b-[var(--site-line)] bg-white/30 shadow-none"
+          }`}
+        >
+        <div
+          className={`mx-auto flex w-full max-w-6xl items-center justify-between transition-[height,padding] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            scrolled ? "h-14 pl-4 pr-1.5" : "h-16 px-5"
           }`}
         >
           <Link href="/" className="group flex items-center gap-2.5" aria-label="EcoWaste home">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--site-accent)] text-white transition-transform duration-500 group-hover:rotate-[360deg]">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--site-accent)] text-white">
               <Leaf className="h-4 w-4" />
             </span>
             <span className="text-lg font-semibold tracking-tight">EcoWaste</span>
@@ -115,6 +121,7 @@ export function Navbar() {
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
+        </div>
         </div>
       </motion.header>
 

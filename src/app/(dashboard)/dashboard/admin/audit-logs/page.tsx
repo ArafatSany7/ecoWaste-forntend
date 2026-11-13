@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/dashboard/page-header";
 import { useQuery } from "@tanstack/react-query";
 import { adminApi } from "@/api/admin.api";
 import { RoleGuard } from "@/components/auth/role-guard";
@@ -18,10 +19,7 @@ export default function AuditLogsPage() {
   return (
     <RoleGuard allowedRoles={["ADMIN"]}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Audit Logs</h1>
-          <p className="text-muted-foreground">View system activity and audit trails.</p>
-        </div>
+        <PageHeader title="Audit Logs" description="View system activity and audit trails." />
 
         {isLoading ? (
           <div className="space-y-4">

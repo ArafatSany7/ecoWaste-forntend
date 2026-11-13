@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/dashboard/page-header";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { wasteRequestApi } from "@/api/waste-request.api";
 import { RoleGuard } from "@/components/auth/role-guard";
@@ -39,10 +40,7 @@ export default function AdminRequestsPage() {
   return (
     <RoleGuard allowedRoles={["ADMIN"]}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Manage Requests</h1>
-          <p className="text-muted-foreground">Monitor and manage all system-wide waste disposal requests.</p>
-        </div>
+        <PageHeader title="Manage Requests" description="Monitor and manage all system-wide waste disposal requests." />
 
         {isLoading ? (
           <div className="space-y-4">

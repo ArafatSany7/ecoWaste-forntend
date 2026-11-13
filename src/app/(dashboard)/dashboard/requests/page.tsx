@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/dashboard/page-header";
 import { useQuery } from "@tanstack/react-query";
 import { wasteRequestApi } from "@/api/waste-request.api";
 import { Button } from "@/components/ui/button";
@@ -23,10 +24,7 @@ export default function RequestsPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">My Requests</h1>
-          <p className="text-muted-foreground">Manage and track your waste disposal requests.</p>
-        </div>
+        <PageHeader title="My Requests" description="Manage and track your waste disposal requests." />
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <Button onClick={() => setIsDialogOpen(true)} className="shrink-0">

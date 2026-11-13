@@ -17,6 +17,7 @@ import {
   TiltCard,
   PillButton,
   Marquee,
+  CountUp,
 } from "@/components/motion/primitives";
 
 const STEPS = [
@@ -72,10 +73,10 @@ const FEATURES = [
 ];
 
 const STATS = [
-  { value: "50+", label: "Cities partnered" },
-  { value: "10M+", label: "Tons managed" },
-  { value: "99.4%", label: "Grid uptime" },
-  { value: "30%", label: "Efficiency gain" },
+  { to: 50, suffix: "+", decimals: 0, label: "Cities partnered" },
+  { to: 10, suffix: "M+", decimals: 0, label: "Tons managed" },
+  { to: 99.4, suffix: "%", decimals: 1, label: "Grid uptime" },
+  { to: 30, suffix: "%", decimals: 0, label: "Efficiency gain" },
 ];
 
 const STATEMENT =
@@ -243,26 +244,23 @@ export default function LandingPage() {
   const heroRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress: heroScroll } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const textY = useTransform(heroScroll, [0, 1], [0, reduce ? 0 : 160]);
-  const textOpacity = useTransform(heroScroll, [0, 0.7], [1, 0]);
-  const statsY = useTransform(heroScroll, [0, 1], [0, reduce ? 0 : 80]);
   const orbA = useTransform(heroScroll, [0, 1], [0, reduce ? 0 : -140]);
   const orbB = useTransform(heroScroll, [0, 1], [0, reduce ? 0 : 200]);
 
   return (
     <main className="relative flex flex-col overflow-x-clip">
-      <section ref={heroRef} className="relative flex min-h-[100dvh] items-center overflow-hidden px-6 pb-24 pt-32 site-grain">
+      <section ref={heroRef} className="relative flex min-h-[100dvh] items-center overflow-hidden px-6 pb-24 pt-32">
         <div className="pointer-events-none absolute inset-0 site-grid" />
         <motion.div
           style={{ y: orbA }}
-          className="pointer-events-none absolute -left-32 top-1/4 h-[460px] w-[460px] rounded-full bg-[var(--site-lime)] opacity-40 blur-[110px]"
+          className="pointer-events-none absolute -left-32 top-1/4 h-[460px] w-[460px] rounded-full opacity-60 will-change-transform [background:radial-gradient(circle,var(--site-lime),transparent_68%)]"
         />
         <motion.div
           style={{ y: orbB }}
-          className="pointer-events-none absolute -right-24 top-10 h-[520px] w-[520px] rounded-full bg-[oklch(0.85_0.12_175)] opacity-40 blur-[120px]"
+          className="pointer-events-none absolute -right-24 top-10 h-[520px] w-[520px] rounded-full opacity-60 will-change-transform [background:radial-gradient(circle,oklch(0.85_0.12_175),transparent_68%)]"
         />
 
-        <motion.div style={{ y: textY, opacity: textOpacity }} className="relative z-10 mx-auto w-full max-w-7xl">
+        <div className="relative z-10 mx-auto w-full max-w-7xl">
           <Reveal y={20}>
             <span className="site-glass inline-flex items-center gap-2.5 rounded-full px-4 py-1.5 text-xs font-medium">
               <span className="relative flex h-2 w-2">
@@ -294,16 +292,16 @@ export default function LandingPage() {
               </div>
             </Reveal>
 
-            <motion.div style={{ y: statsY }} className="site-glass grid grid-cols-2 gap-x-10 gap-y-6 rounded-3xl p-7 md:min-w-[380px]">
-              {STATS.map((s) => (
+            <div className="site-glass grid grid-cols-2 gap-x-10 gap-y-6 rounded-3xl p-7 md:min-w-[380px]">
+              {STATS.map((s, i) => (
                 <div key={s.label}>
-                  <div className="text-3xl font-semibold tracking-tight text-[var(--site-accent)] md:text-4xl">{s.value}</div>
+                  <CountUp to={s.to} suffix={s.suffix} decimals={s.decimals} delay={0.2 + i * 0.12} className="block text-3xl font-semibold tracking-tight text-[var(--site-accent)] md:text-4xl" />
                   <div className="mt-1 text-xs uppercase tracking-[0.16em] text-muted-foreground">{s.label}</div>
                 </div>
               ))}
-            </motion.div>
+            </div>
           </div>
-        </motion.div>
+        </div>
       </section>
 
       <Marquee items={["Smart routing", "Live tracking", "Zero waste", "Citizen first", "Verified pickups", "Clean cities"]} />
@@ -359,7 +357,7 @@ export default function LandingPage() {
       <section className="px-6 pb-32">
         <Reveal y={60} className="mx-auto max-w-7xl">
           <div className="site-glass site-grain relative overflow-hidden rounded-[2.5rem] px-8 py-20 text-center md:px-20 md:py-28">
-            <div className="pointer-events-none absolute left-1/2 top-0 h-80 w-[700px] -translate-x-1/2 rounded-full bg-[var(--site-lime)] opacity-40 blur-[110px]" />
+            <div className="pointer-events-none absolute left-1/2 top-0 h-80 w-[700px] -translate-x-1/2 rounded-full opacity-60 [background:radial-gradient(ellipse,var(--site-lime),transparent_70%)]" />
             <div className="relative z-10 flex flex-col items-center gap-8">
               <Eyebrow>Join EcoWaste</Eyebrow>
               <SplitHeading

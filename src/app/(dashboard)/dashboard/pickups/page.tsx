@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/dashboard/page-header";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { wasteRequestApi } from "@/api/waste-request.api";
 import { collectorApi } from "@/api/collector.api";
@@ -39,10 +40,7 @@ export default function PickupsPage() {
   return (
     <RoleGuard allowedRoles={["COLLECTOR", "ADMIN"]}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Assigned Pickups</h1>
-          <p className="text-muted-foreground">Manage and update the status of your assigned waste collections.</p>
-        </div>
+        <PageHeader title="Assigned Pickups" description="Manage and update the status of your assigned waste collections." />
 
         {isLoading ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
