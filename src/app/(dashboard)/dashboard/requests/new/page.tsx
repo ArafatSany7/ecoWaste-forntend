@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/dashboard/page-header";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -82,10 +83,7 @@ export default function NewPickupRequestPage() {
   return (
     <RoleGuard allowedRoles={["CITIZEN", "ADMIN"]}>
       <div className="max-w-2xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Schedule Pickup</h1>
-          <p className="text-muted-foreground">Create a new waste pickup request using our wizard.</p>
-        </div>
+        <PageHeader title="Schedule Pickup" description="Create a new waste pickup request using our wizard." />
 
         {/* Stepper */}
         <div className="flex items-center justify-between mb-8">

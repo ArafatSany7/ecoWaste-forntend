@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/dashboard/page-header";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/api/admin.api";
 import { RoleGuard } from "@/components/auth/role-guard";
@@ -47,10 +48,7 @@ export default function AdminUsersPage() {
   return (
     <RoleGuard allowedRoles={["ADMIN"]}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Manage Users</h1>
-          <p className="text-muted-foreground">View all registered users, assign roles, and manage account statuses.</p>
-        </div>
+        <PageHeader title="Manage Users" description="View all registered users, assign roles, and manage account statuses." />
 
         {isLoading ? (
           <div className="space-y-4">

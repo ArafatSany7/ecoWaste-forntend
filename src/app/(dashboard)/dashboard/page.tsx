@@ -9,6 +9,8 @@ import { adminApi } from "@/api/admin.api";
 import { wasteRequestApi } from "@/api/waste-request.api";
 import { collectorApi } from "@/api/collector.api";
 import { motion } from "framer-motion";
+import { Reveal, TiltCard } from "@/components/motion/primitives";
+import { PageHeader } from "@/components/dashboard/page-header";
 import { Leaf, Truck, CheckCircle2, TrendingUp, Users, DollarSign } from "lucide-react";
 
 const DashboardCharts = dynamic(() => import("@/components/dashboard/dashboard-charts"), {
@@ -21,45 +23,23 @@ interface KpiCardProps {
   value: React.ReactNode;
   sub: string;
   icon: React.ReactNode;
-  glowColor: string;
   delay?: number;
 }
 
-function KpiCard({ title, value, sub, icon, glowColor, delay = 0 }: KpiCardProps) {
+function KpiCard({ title, value, sub, icon, delay = 0 }: KpiCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay, ease: "easeOut" }}
-      whileHover={{ scale: 1.03, y: -2 }}
-      className="relative rounded-2xl p-5 flex flex-col gap-3 overflow-hidden cursor-default"
-      style={{
-        background: `${glowColor}0d`,
-        border: `1px solid ${glowColor}30`,
-        boxShadow: `0 0 24px ${glowColor}18`,
-        backdropFilter: "blur(16px)",
-      }}
-    >
-      <div
-        className="absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl opacity-20 pointer-events-none"
-        style={{ background: glowColor, transform: "translate(30%, -30%)" }}
-      />
-
-      <div className="flex items-start justify-between">
-        <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "oklch(0.65 0.04 160)" }}>
-          {title}
-        </span>
-        <div
-          className="w-8 h-8 rounded-lg flex items-center justify-center"
-          style={{ background: `${glowColor}22`, color: glowColor }}
-        >
-          {icon}
+    <Reveal delay={delay}>
+      <TiltCard intensity={7} className="p-6">
+        <div className="flex items-start justify-between">
+          <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">{title}</span>
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--site-line)] bg-[var(--site-accent-soft)] text-[var(--site-accent)] transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110">
+            {icon}
+          </span>
         </div>
-      </div>
-
-      <div className="text-3xl font-black text-white">{value}</div>
-      <div className="text-xs" style={{ color: "oklch(0.55 0.04 160)" }}>{sub}</div>
-    </motion.div>
+        <div className="mt-8 text-4xl font-semibold tracking-tight">{value}</div>
+        <div className="mt-1 text-xs text-muted-foreground">{sub}</div>
+      </TiltCard>
+    </Reveal>
   );
 }
 
@@ -100,25 +80,15 @@ export default function DashboardOverviewPage() {
   return (
     <RoleGuard allowedRoles={["CITIZEN", "COLLECTOR", "ADMIN"]}>
       <div className="space-y-8">
-        <motion.div
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="text-3xl font-black text-white tracking-tight">Dashboard Overview</h1>
-          <p className="text-sm mt-1" style={{ color: "oklch(0.60 0.04 160)" }}>
-            Welcome back,{" "}
-            <span style={{ color: "oklch(0.72 0.22 160)" }}>
-              {user?.firstName || user?.name || "User"}
-            </span>
-            ! Here is a summary of your eco-activity.
-          </p>
-        </motion.div>
+        <PageHeader
+          title="Dashboard overview"
+          description={<>Welcome back, <span className="font-medium text-[var(--site-accent)]">{user?.firstName || user?.name || "User"}</span>. Here is a summary of your eco-activity.</>}
+        />
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {isLoading ? (
             Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-36 rounded-2xl" style={{ background: "oklch(0.18 0.03 160)" }} />
+              <Skeleton key={i} className="h-40 rounded-3xl" />
             ))
           ) : (
             <>
@@ -128,7 +98,6 @@ export default function DashboardOverviewPage() {
                 value={totalRequests}
                 sub="All time activity"
                 icon={<Truck className="h-4 w-4" />}
-                glowColor="oklch(0.78 0.18 195)"
               />
               <KpiCard
                 delay={0.08}
@@ -136,7 +105,6 @@ export default function DashboardOverviewPage() {
                 value={completedRequests}
                 sub="Successfully resolved"
                 icon={<CheckCircle2 className="h-4 w-4" />}
-                glowColor="oklch(0.72 0.22 160)"
               />
 
               {role === "ADMIN" ? (
@@ -147,7 +115,6 @@ export default function DashboardOverviewPage() {
                     value={adminStats?.users?.total || 0}
                     sub="Registered accounts"
                     icon={<Users className="h-4 w-4" />}
-                    glowColor="oklch(0.68 0.28 320)"
                   />
                   <KpiCard
                     delay={0.24}
@@ -155,7 +122,6 @@ export default function DashboardOverviewPage() {
                     value={`৳${adminStats?.financials?.totalRevenue || 0}`}
                     sub="From paid invoices"
                     icon={<DollarSign className="h-4 w-4" />}
-                    glowColor="oklch(0.82 0.18 85)"
                   />
                 </>
               ) : (
@@ -166,7 +132,6 @@ export default function DashboardOverviewPage() {
                     value={completedRequests * 10}
                     sub="Keep recycling to earn more!"
                     icon={<Leaf className="h-4 w-4" />}
-                    glowColor="oklch(0.72 0.22 160)"
                   />
                   <KpiCard
                     delay={0.24}
@@ -174,7 +139,6 @@ export default function DashboardOverviewPage() {
                     value={`${completionRate}%`}
                     sub="Of all your requests"
                     icon={<TrendingUp className="h-4 w-4" />}
-                    glowColor="oklch(0.82 0.18 85)"
                   />
                 </>
               )}

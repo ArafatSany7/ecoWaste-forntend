@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/dashboard/page-header";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { wasteCategoryApi } from "@/api/waste-category.api";
@@ -66,10 +67,7 @@ export default function AdminCategoriesPage() {
     <RoleGuard allowedRoles={["ADMIN"]}>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Waste Categories</h1>
-            <p className="text-muted-foreground">Manage types of waste and their collection pricing.</p>
-          </div>
+          <PageHeader title="Waste Categories" description="Manage types of waste and their collection pricing." />
           
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger render={<Button />}>

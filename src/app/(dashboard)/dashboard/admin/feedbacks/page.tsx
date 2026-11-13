@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/dashboard/page-header";
 import { useQuery } from "@tanstack/react-query";
 import { feedbackApi } from "@/api/feedback.api";
 import { RoleGuard } from "@/components/auth/role-guard";
@@ -19,10 +20,7 @@ export default function FeedbacksPage() {
   return (
     <RoleGuard allowedRoles={["ADMIN"]}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">User Feedback</h1>
-          <p className="text-muted-foreground">View feedback provided by citizens and collectors.</p>
-        </div>
+        <PageHeader title="User Feedback" description="View feedback provided by citizens and collectors." />
 
         {isLoading ? (
           <div className="space-y-4">

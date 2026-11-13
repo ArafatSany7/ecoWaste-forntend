@@ -3,6 +3,8 @@
 import * as React from "react";
 import Link from "next/link";
 import {
+  animate,
+  useInView,
   motion,
   useMotionValue,
   useReducedMotion,
@@ -25,11 +27,12 @@ export function Reveal({ delay = 0, y = 40, className, children, ...rest }: Reve
   const reduce = useReducedMotion();
   return (
     <motion.div
-      initial={reduce ? false : { opacity: 0, y, filter: "blur(8px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      initial={reduce ? false : { opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.9, delay, ease: EASE_OUT }}
       className={className}
+      style={{ willChange: "transform, opacity" }}
       {...rest}
     >
       {children}
@@ -224,4 +227,44 @@ export function Marquee({ items }: { items: string[] }) {
 export function useParallax(target: React.RefObject<HTMLElement | null>, distance = 80) {
   const { scrollYProgress } = useScroll({ target, offset: ["start end", "end start"] });
   return useTransform(scrollYProgress, [0, 1], [distance, -distance]);
+}
+
+interface CountUpProps {
+  to: number;
+  decimals?: number;
+  suffix?: string;
+  prefix?: string;
+  duration?: number;
+  delay?: number;
+  className?: string;
+}
+
+export function CountUp({ to, decimals = 0, suffix = "", prefix = "", duration = 2.2, delay = 0, className }: CountUpProps) {
+  const reduce = useReducedMotion();
+  const ref = React.useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
+  const value = useMotionValue(0);
+  const text = useTransform(value, (v) => `${prefix}${v.toFixed(decimals)}${suffix}`);
+
+  React.useEffect(() => {
+    if (!inView) return;
+    if (reduce) {
+      value.set(to);
+      return;
+    }
+    const controls = animate(value, to, { duration, delay, ease: [0.16, 1, 0.3, 1] });
+    return () => controls.stop();
+  }, [inView, reduce, to, duration, delay, value]);
+
+  return (
+    <motion.span
+      ref={ref}
+      initial={reduce ? false : { opacity: 0, y: 14 }}
+      animate={inView ? { opacity: 1, y: 0 } : undefined}
+      transition={{ duration: 0.9, delay, ease: EASE_OUT }}
+      className={cn("inline-block tabular-nums", className)}
+    >
+      <motion.span>{text}</motion.span>
+    </motion.span>
+  );
 }
