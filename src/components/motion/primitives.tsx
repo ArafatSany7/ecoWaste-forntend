@@ -224,10 +224,6 @@ export function Marquee({ items }: { items: string[] }) {
   );
 }
 
-export function useParallax(target: React.RefObject<HTMLElement | null>, distance = 80) {
-  const { scrollYProgress } = useScroll({ target, offset: ["start end", "end start"] });
-  return useTransform(scrollYProgress, [0, 1], [distance, -distance]);
-}
 
 interface CountUpProps {
   to: number;

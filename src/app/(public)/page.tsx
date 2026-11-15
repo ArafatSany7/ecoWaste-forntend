@@ -160,21 +160,21 @@ function StackCard({
   const leaveStart = index / total;
   const leaveEnd = (index + 1) / total;
 
-  const rawY = useTransform(progress, [enterStart, enterEnd], [index === 0 ? 0 : 108, 0]);
-  const y = useTransform(rawY, (v) => `${v}%`);
+  const enter = useTransform(progress, [enterStart, enterEnd], [index === 0 ? 0 : 108, 0]);
   const rotateX = useTransform(progress, [leaveStart, leaveEnd], [0, reduce ? 0 : -7]);
   const scale = useTransform(progress, [leaveStart, leaveEnd], [1, reduce ? 1 : 0.92]);
   const veil = useTransform(progress, [leaveStart, leaveEnd], [0, 0.5]);
   const lift = useTransform(progress, [leaveStart, leaveEnd], [0, -24]);
+  const y = useTransform([enter, lift], ([e, l]: number[]) => `calc(${e}% + ${l}px)`);
   const ringProgress = useTransform(progress, [enterStart, enterEnd + 0.04], [0, 1], { clamp: true });
 
   return (
     <motion.article
-      style={{ y, rotateX, scale, translateY: lift, zIndex: index, transformOrigin: "50% 0%" }}
+      style={{ y, rotateX, scale, zIndex: index, transformOrigin: "50% 0%" }}
       className="absolute inset-0 overflow-hidden rounded-[2rem] border border-[var(--site-line)] shadow-[0_40px_80px_-40px_oklch(0.3_0.06_160/0.4)]"
     >
       <div className="absolute inset-0" style={{ background: step.tint }} />
-      <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[var(--site-lime)] opacity-30 blur-3xl" />
+      <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full opacity-50 [background:radial-gradient(circle,var(--site-lime),transparent_68%)]" />
       <div className="relative grid h-full gap-6 p-7 md:grid-cols-[1.2fr_1fr] md:gap-10 md:p-12">
         <div className="flex flex-col justify-between gap-6">
           <div className="flex items-center gap-3">
@@ -261,7 +261,6 @@ export default function LandingPage() {
         />
 
         <div className="relative z-10 mx-auto w-full max-w-7xl">
-
           <SplitHeading
             as="h1"
             text="Smarter waste for sustainable cities"
@@ -347,7 +346,7 @@ export default function LandingPage() {
 
       <section className="px-6 pb-32">
         <Reveal y={60} className="mx-auto max-w-7xl">
-          <div className="site-glass site-grain relative overflow-hidden rounded-[2.5rem] px-8 py-20 text-center md:px-20 md:py-28">
+          <div className="site-glass relative overflow-hidden rounded-[2.5rem] px-8 py-20 text-center md:px-20 md:py-28">
             <div className="pointer-events-none absolute left-1/2 top-0 h-80 w-[700px] -translate-x-1/2 rounded-full opacity-60 [background:radial-gradient(ellipse,var(--site-lime),transparent_70%)]" />
             <div className="relative z-10 flex flex-col items-center gap-8">
               <Eyebrow>Join EcoWaste</Eyebrow>

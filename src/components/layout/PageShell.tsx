@@ -10,7 +10,7 @@ interface PageHeroProps {
 
 export function PageHero({ eyebrow, title, accentWords, lead }: PageHeroProps) {
   return (
-    <section className="relative overflow-hidden pb-16 pt-40 md:pt-48 site-grain">
+    <section className="relative overflow-hidden pb-16 pt-40 md:pt-48">
       <div className="pointer-events-none absolute inset-0 site-grid" />
       <div className="pointer-events-none absolute left-1/2 top-1/4 h-96 w-[720px] -translate-x-1/2 rounded-full bg-[oklch(0.88_0.2_128/0.3)] blur-[110px]" />
       <MaxWidthWrapper className="relative z-10 flex flex-col gap-8">
