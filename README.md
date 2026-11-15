@@ -1,3 +1,22 @@
+# EcoWaste Frontend
+
+Smart city waste management platform connecting citizens, collectors and administrators.
+
+## Tech Stack
+
+- Next.js and React
+- Tailwind CSS with shadcn/ui
+- Framer Motion and Lenis for scroll animations
+- React Three Fiber for 3D scenes
+- TanStack Query and Zustand for data and state
+
+## Features
+
+- Scroll-driven landing page with animated sections
+- Citizen, collector and admin dashboards
+- Waste pickup requests, zones and categories management
+- Invoices and online payments via SSLCommerz
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
