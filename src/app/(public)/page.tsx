@@ -261,22 +261,13 @@ export default function LandingPage() {
         />
 
         <div className="relative z-10 mx-auto w-full max-w-7xl">
-          <Reveal y={20}>
-            <span className="site-glass inline-flex items-center gap-2.5 rounded-full px-4 py-1.5 text-xs font-medium">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--site-accent)] opacity-70" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--site-accent)]" />
-              </span>
-              Platform v2.0 is live
-            </span>
-          </Reveal>
 
           <SplitHeading
             as="h1"
             text="Smarter waste for sustainable cities"
             accentWords={["sustainable", "cities"]}
             delay={0.15}
-            className="mt-8 max-w-5xl text-5xl font-semibold sm:text-6xl md:text-7xl lg:text-[7.5rem]"
+            className="max-w-5xl text-5xl font-semibold sm:text-6xl md:text-7xl lg:text-[7.5rem]"
           />
 
           <div className="mt-10 flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
