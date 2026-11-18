@@ -7,6 +7,7 @@ import { Menu, X, Leaf } from "lucide-react";
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
 import { useAuthStore } from "@/store/auth.store";
 import { PillButton, EASE_OUT } from "@/components/motion/primitives";
+import { jumpToHash } from "@/lib/scroll";
 
 const NAV_LINKS = [
   { name: "How it works", href: "/how-it-works" },
@@ -35,6 +36,31 @@ export function Navbar() {
     };
   }, [open]);
 
+  // Navbar links jump straight to their destination instead of smooth-scrolling through
+  // every section in between (which fires all the scroll animations on the way).
+  const pendingJump = React.useRef<string | null>(null);
+
+  React.useLayoutEffect(() => {
+    const hash = pendingJump.current;
+    if (hash === null) return;
+    pendingJump.current = null;
+    jumpToHash(hash);
+  }, [pathname]);
+
+  const navigate = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; // new tab etc.
+    e.preventDefault();
+    e.nativeEvent.stopPropagation(); // keep Lenis' anchor handler from animating the jump
+    const [path, hash = ""] = href.split("#");
+    if ((path || "/") === pathname) {
+      jumpToHash(hash);
+      window.history.replaceState(window.history.state, "", href);
+      return;
+    }
+    pendingJump.current = hash;
+    router.push(href, { scroll: false });
+  };
+
   const handleLogout = () => {
     logout();
     router.push("/");
@@ -62,7 +88,7 @@ export function Navbar() {
             scrolled ? "h-14 pl-4 pr-1.5" : "h-16 px-5"
           }`}
         >
-          <Link href="/" className="group flex items-center gap-2.5" aria-label="EcoWaste home">
+          <Link href="/" onClick={(e) => navigate(e, "/")} className="group flex items-center gap-2.5" aria-label="EcoWaste home">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--site-accent)] text-white">
               <Leaf className="h-4 w-4" />
             </span>
@@ -76,6 +102,7 @@ export function Navbar() {
                 <Link
                   key={link.name}
                   href={link.href}
+                  onClick={(e) => navigate(e, link.href)}
                   className="group relative rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors duration-300 hover:text-foreground"
                 >
                   {link.name}
@@ -144,7 +171,10 @@ export function Navbar() {
                 >
                   <Link
                     href={link.href}
-                    onClick={() => setOpen(false)}
+                    onClick={(e) => {
+                      setOpen(false);
+                      navigate(e, link.href);
+                    }}
                     className="block py-2 text-4xl font-semibold tracking-tight transition-colors hover:text-[var(--site-accent)]"
                   >
                     {link.name}
