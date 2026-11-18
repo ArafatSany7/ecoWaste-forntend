@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PageHero } from "@/components/layout/PageShell";
+import { HowItWorksExperience } from "@/components/how-it-works/Experience";
 
 export const metadata: Metadata = {
   title: "How it works - EcoWaste",
@@ -10,13 +10,7 @@ export const metadata: Metadata = {
 export default function HowItWorksPage() {
   return (
     <main className="relative flex flex-col overflow-x-clip">
-      <PageHero
-        eyebrow="How it works"
-        title="From request to resolution, live"
-        accentWords={["live"]}
-        lead="An interactive map tour of every pickup is on its way. Scroll through each step as a collector moves across the city."
-      />
-      <div className="pb-32" />
+      <HowItWorksExperience />
     </main>
   );
 }
