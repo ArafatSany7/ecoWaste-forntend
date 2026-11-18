@@ -9,7 +9,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { PillButton, EASE_OUT } from "@/components/motion/primitives";
 
 const NAV_LINKS = [
-  { name: "How it works", href: "/#story" },
+  { name: "How it works", href: "/how-it-works" },
   { name: "Features", href: "/#features" },
   { name: "About", href: "/about" },
   { name: "Sustainability", href: "/sustainability" },
