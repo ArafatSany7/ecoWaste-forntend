@@ -276,7 +276,7 @@ export default function LandingPage() {
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <PillButton href="/register">Get started free</PillButton>
-                <PillButton href="/#story" variant="ghost">
+                <PillButton href="/how-it-works" variant="ghost">
                   See how it works
                 </PillButton>
               </div>

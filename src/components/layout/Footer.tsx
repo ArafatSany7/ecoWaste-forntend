@@ -5,7 +5,7 @@ import { MaxWidthWrapper } from "@/components/layout/MaxWidthWrapper";
 const FOOTER_LINKS = {
   Product: [
     { name: "Features", href: "/#features" },
-    { name: "How it works", href: "/#story" },
+    { name: "How it works", href: "/how-it-works" },
   ],
   Company: [
     { name: "About", href: "/about" },

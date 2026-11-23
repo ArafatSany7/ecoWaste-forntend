@@ -81,9 +81,9 @@ function Body() {
   );
 }
 
-function Truck() {
+export function Truck({ yaw = -0.32 }: { yaw?: number }) {
   return (
-    <group rotation={[0, -0.32, 0]}>
+    <group rotation={[0, yaw, 0]}>
       <RoundedBox args={[4.2, 0.26, 1.2]} radius={0.06} position={[-0.05, -0.52, 0]}>
         <meshStandardMaterial color="#2e3439" roughness={0.6} />
       </RoundedBox>
