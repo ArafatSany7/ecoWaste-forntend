@@ -68,6 +68,40 @@ function DispatchEta({ progress }: { progress: MotionValue<number> }) {
   );
 }
 
+/** Amount ticks up, then the check draws itself and the badge settles to "Paid". */
+function PaymentReceipt({ progress, start }: { progress: MotionValue<number>; start: number }) {
+  const settle = [start + 0.015, start + 0.06];
+  const amount = useTransform(progress, settle, [0, 250]);
+  const amountText = useTransform(amount, (v) => `৳${v.toFixed(2)}`);
+  const check = useTransform(progress, [start + 0.05, start + 0.08], [0, 1]);
+  const badge = useTransform(progress, [start + 0.05, start + 0.07], [0.35, 1]);
+  return (
+    <div className="flex items-center justify-between rounded-2xl bg-[var(--site-accent-soft)] px-4 py-3">
+      <div>
+        <div className="font-mono text-xs text-foreground/70">Invoice #EW-2041</div>
+        <motion.div className="text-lg font-semibold tabular-nums">{amountText}</motion.div>
+      </div>
+      <motion.span
+        style={{ opacity: badge }}
+        className="flex items-center gap-1.5 rounded-full bg-[var(--site-accent)] px-3 py-1 text-xs font-semibold text-white"
+      >
+        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden>
+          <circle cx="8" cy="8" r="7" stroke="currentColor" strokeOpacity={0.45} strokeWidth={1.5} />
+          <motion.path
+            d="M4.8 8.3 7 10.4l4.2-4.6"
+            stroke="currentColor"
+            strokeWidth={1.8}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ pathLength: check }}
+          />
+        </svg>
+        Paid
+      </motion.span>
+    </div>
+  );
+}
+
 function StepDetails({ step, progress }: { step: Step; progress: MotionValue<number> }) {
   switch (step.id) {
     case "request":
@@ -99,17 +133,7 @@ function StepDetails({ step, progress }: { step: Step; progress: MotionValue<num
         </>
       );
     case "pay":
-      return (
-        <div className="flex items-center justify-between rounded-2xl bg-[var(--site-accent-soft)] px-4 py-3">
-          <div>
-            <div className="font-mono text-xs text-muted-foreground">Invoice #EW-2041</div>
-            <div className="text-lg font-semibold tabular-nums">৳250.00</div>
-          </div>
-          <span className="flex items-center gap-1.5 rounded-full bg-[var(--site-accent)] px-3 py-1 text-xs font-semibold text-white">
-            <CheckCircle2 className="h-3.5 w-3.5" /> Paid
-          </span>
-        </div>
-      );
+      return <PaymentReceipt progress={progress} start={step.range[0]} />;
   }
 }
 
@@ -201,6 +225,8 @@ export function HowItWorksExperience() {
       <div className={reduce ? "relative h-[80vh]" : "sticky top-0 h-[100dvh] overflow-hidden"}>
         {/* Map */}
         <motion.div
+          role="img"
+          aria-label="Animated city map: a pickup is requested at a house, a route is planned from the EcoWaste depot, and a collection truck drives there to collect the waste."
           className="absolute inset-0 bg-[var(--background)]"
           initial={{ opacity: 0 }}
           animate={{ opacity: ready ? 1 : 0 }}
@@ -238,7 +264,7 @@ export function HowItWorksExperience() {
               className="pointer-events-none absolute inset-x-0 bottom-10 flex justify-center"
             >
               <motion.div
-                className="flex flex-col items-center gap-1 text-xs font-medium uppercase tracking-[0.18em] text-foreground/60"
+                className="flex flex-col items-center gap-1 text-xs font-medium uppercase tracking-[0.18em] text-foreground/75"
                 animate={{ y: [0, 6, 0] }}
                 transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
               >
@@ -248,7 +274,7 @@ export function HowItWorksExperience() {
             </motion.div>
 
             {/* Step cards — stacked in one grid cell, each scrubbed by its own range */}
-            <div className="pointer-events-none absolute inset-x-4 bottom-20 grid sm:inset-x-auto sm:left-1/2 sm:w-[420px] sm:-translate-x-1/2 lg:bottom-auto lg:left-[max(2rem,5vw)] lg:top-1/2 lg:w-[400px] lg:translate-x-0 lg:-translate-y-1/2">
+            <div className="pointer-events-none absolute inset-x-4 bottom-24 grid sm:inset-x-auto sm:left-1/2 sm:w-[420px] sm:-translate-x-1/2 lg:bottom-auto lg:left-[max(2rem,5vw)] lg:top-1/2 lg:w-[400px] lg:translate-x-0 lg:-translate-y-1/2">
               {STEPS.map((s, i) => (
                 <StepCard key={s.id} step={s} index={i} progress={progress} active={i === active} />
               ))}
@@ -271,7 +297,7 @@ export function HowItWorksExperience() {
                         onClick={() => goTo(i)}
                         aria-current={on ? "step" : undefined}
                         aria-label={`Step ${s.number}: ${s.title}`}
-                        className="relative flex h-8 items-center gap-2 rounded-full px-3 text-xs font-medium"
+                        className="relative flex h-11 min-w-11 items-center justify-center gap-2 rounded-full px-3 text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-[var(--site-accent)] focus-visible:ring-offset-2 lg:h-9"
                       >
                         {on && (
                           <motion.span
@@ -282,7 +308,7 @@ export function HowItWorksExperience() {
                         )}
                         <span
                           className={`relative font-mono transition-colors duration-300 ${
-                            on ? "text-white" : done ? "text-[var(--site-accent)]" : "text-foreground/60"
+                            on ? "text-white" : done ? "text-[var(--site-accent)]" : "text-foreground/75"
                           }`}
                         >
                           {s.number}

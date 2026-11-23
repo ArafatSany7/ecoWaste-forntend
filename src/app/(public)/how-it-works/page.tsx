@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { HowItWorksExperience } from "@/components/how-it-works/Experience";
+import { ClosingCta } from "@/components/how-it-works/ClosingCta";
 
 export const metadata: Metadata = {
   title: "How it works - EcoWaste",
@@ -11,6 +12,7 @@ export default function HowItWorksPage() {
   return (
     <main className="relative flex flex-col overflow-x-clip">
       <HowItWorksExperience />
+      <ClosingCta />
     </main>
   );
 }

@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Html } from "@react-three/drei";
 import type { MotionValue } from "framer-motion";
 import * as THREE from "three";
 import { Truck } from "@/components/auth/scenes/TruckScene";
@@ -255,19 +256,97 @@ function MovingTruck({ route, progress, truckPos }: {
   truckPos: THREE.Vector3;
 }) {
   const ref = useRef<THREE.Group>(null);
+  const body = useRef<THREE.Group>(null);
   const tangent = useMemo(() => new THREE.Vector3(), []);
   useFrame(() => {
-    if (!ref.current) return;
+    if (!ref.current || !body.current) return;
     const u = truckProgress(progress.get());
     route.getPointAt(u, truckPos);
     route.getTangentAt(Math.min(u, 0.999), tangent);
     ref.current.position.set(truckPos.x, 1.05 * TRUCK_SCALE + 0.02, truckPos.z);
-    ref.current.rotation.y = Math.atan2(-tangent.z, tangent.x);
+    body.current.rotation.y = Math.atan2(-tangent.z, tangent.x);
   });
   return (
-    <group ref={ref} scale={TRUCK_SCALE}>
-      <Truck yaw={0} />
-      <GroundShadow y={-1.0} sx={2.6} sz={1.25} />
+    <group ref={ref}>
+      <group ref={body} scale={TRUCK_SCALE}>
+        <Truck yaw={0} />
+        <GroundShadow y={-1.0} sx={2.6} sz={1.25} />
+      </group>
+      <MapLabel
+        progress={progress}
+        position={[0, 0.55, 0]}
+        visible={(p) => fadeWindow(p, DISPATCH[0] - 0.01, DISPATCH[0] + 0.02, COLLECT[1] - 0.02, COLLECT[1])}
+        live
+      >
+        EW-12 · Rahim
+      </MapLabel>
+    </group>
+  );
+}
+
+/** 0 → 1 → 0 over [inA, inB] … [outA, outB]. */
+function fadeWindow(p: number, inA: number, inB: number, outA: number, outB: number) {
+  return easeInOutCubic(segment(p, inA, inB)) * (1 - easeInOutCubic(segment(p, outA, outB)));
+}
+
+/**
+ * Screen-aligned DOM chip pinned to a 3D point. Opacity is written straight to the DOM in
+ * the render loop, so labels cost no React renders while scrolling.
+ */
+function MapLabel({ progress, position, visible, live, children }: {
+  progress: MotionValue<number>;
+  position: [number, number, number];
+  visible: (p: number) => number;
+  live?: boolean;
+  children: React.ReactNode;
+}) {
+  const el = useRef<HTMLDivElement>(null);
+  useFrame(() => {
+    if (!el.current) return;
+    const o = visible(progress.get());
+    el.current.style.opacity = o.toFixed(3);
+    el.current.style.transform = `translateY(${((1 - o) * 8).toFixed(2)}px)`;
+    el.current.style.visibility = o < 0.01 ? "hidden" : "visible";
+  });
+  return (
+    <Html position={position} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+      <div
+        ref={el}
+        aria-hidden
+        className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-black/5 bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-[#14301f] shadow-[0_6px_18px_-8px_rgba(16,60,35,0.45)]"
+        style={{ opacity: 0, visibility: "hidden" }}
+      >
+        <span className="relative flex h-1.5 w-1.5">
+          {live && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#1f8f4e] opacity-60" />}
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#1f8f4e]" />
+        </span>
+        {children}
+      </div>
+    </Html>
+  );
+}
+
+/** Two expanding rings at the pickup point while the bin is being emptied. */
+function CollectPulse({ progress }: { progress: MotionValue<number> }) {
+  const rings = useRef<(THREE.Mesh | null)[]>([]);
+  useFrame(() => {
+    const t = segment(progress.get(), COLLECT[0] + 0.01, COLLECT[1] - 0.02);
+    const on = t > 0 && t < 1 ? 1 : 0;
+    rings.current.forEach((ring, i) => {
+      if (!ring) return;
+      const phase = (t * 2 + i * 0.5) % 1;
+      ring.scale.setScalar(0.35 + phase * 1.9);
+      (ring.material as THREE.MeshBasicMaterial).opacity = on * (1 - phase) * 0.55;
+    });
+  });
+  return (
+    <group position={[HOME.x - 0.4, 0.075, HOME.z + 0.2]} rotation={[-Math.PI / 2, 0, 0]}>
+      {[0, 1].map((i) => (
+        <mesh key={i} ref={(m) => { rings.current[i] = m; }}>
+          <ringGeometry args={[0.42, 0.5, 48]} />
+          <meshBasicMaterial color={LIME} transparent opacity={0} depthWrite={false} />
+        </mesh>
+      ))}
     </group>
   );
 }
@@ -368,7 +447,22 @@ export default function CityMap({ progress, onReady }: { progress: MotionValue<n
         <Bin progress={progress} />
         <Route route={route} progress={progress} />
         <Pin progress={progress} />
+        <CollectPulse progress={progress} />
         <MovingTruck route={route} progress={progress} truckPos={truckPos} />
+        <MapLabel
+          progress={progress}
+          position={[DEPOT.x, 1.3, DEPOT.z]}
+          visible={(p) => fadeWindow(p, APPROVE[0] + 0.04, APPROVE[0] + 0.07, DISPATCH[0] + 0.08, DISPATCH[0] + 0.11)}
+        >
+          EcoWaste depot
+        </MapLabel>
+        <MapLabel
+          progress={progress}
+          position={[HOME.x, 2.05, HOME.z]}
+          visible={(p) => fadeWindow(p, REQUEST[0] + 0.08, REQUEST[0] + 0.11, PAY[0], PAY[0] + 0.03)}
+        >
+          Pickup · House 14
+        </MapLabel>
         <CameraRig progress={progress} truckPos={truckPos} />
         <Invalidator progress={progress} />
         <StaticShadows />
