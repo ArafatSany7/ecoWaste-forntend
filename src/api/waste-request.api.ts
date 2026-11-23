@@ -1,12 +1,14 @@
 import { apiClient } from "./client";
 
+/** Matches the backend's createWasteRequestSchema. */
 export interface WasteRequestPayload {
-  title: string;
-  description: string;
-  wasteType: "PLASTIC" | "ORGANIC" | "E_WASTE" | "PAPER" | "METAL" | "OTHER";
-  estimatedWeight?: string;
+  categoryId: string;
+  zoneId: string;
   address: string;
-  contactNumber: string;
+  weight?: number;
+  /** Pickup pin. Both or neither. */
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface WasteRequestResponse {

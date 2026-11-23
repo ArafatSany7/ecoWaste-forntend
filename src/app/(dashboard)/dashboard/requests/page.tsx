@@ -3,44 +3,29 @@
 import { PageHeader } from "@/components/dashboard/page-header";
 import { useQuery } from "@tanstack/react-query";
 import { wasteRequestApi } from "@/api/waste-request.api";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 import { Plus, Clock, MapPin, Truck } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { CreateRequestForm } from "@/components/form/create-request-form";
-import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function RequestsPage() {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
   const { data, isLoading, isError } = useQuery({
     queryKey: ["waste-requests"],
     queryFn: () => wasteRequestApi.getMyRequests(),
   });
 
-  const requests = (data as any)?.data || [];
+  const requests: Record<string, unknown>[] = (data as { data?: Record<string, unknown>[] } | undefined)?.data ?? [];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <PageHeader title="My Requests" description="Manage and track your waste disposal requests." />
         
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <Button onClick={() => setIsDialogOpen(true)} className="shrink-0">
-            <Plus className="mr-2 h-4 w-4" />
-            New Request
-          </Button>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>Create Waste Request</DialogTitle>
-              <DialogDescription>
-                Fill in the details below to schedule a new waste pickup.
-              </DialogDescription>
-            </DialogHeader>
-            <CreateRequestForm onSuccess={() => setIsDialogOpen(false)} />
-          </DialogContent>
-        </Dialog>
+        <Link href="/dashboard/requests/new" className={buttonVariants({ className: "shrink-0" })}>
+          <Plus className="mr-2 h-4 w-4" />
+          New Request
+        </Link>
       </div>
 
       {isLoading ? (
@@ -66,9 +51,9 @@ export default function RequestsPage() {
           <p className="text-muted-foreground max-w-sm mx-auto mb-6">
             You haven&apos;t made any waste disposal requests yet. Create your first request to get started!
           </p>
-          <Button onClick={() => setIsDialogOpen(true)} variant="outline">
+          <Link href="/dashboard/requests/new" className={buttonVariants({ variant: "outline" })}>
             Create First Request
-          </Button>
+          </Link>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -79,7 +64,7 @@ export default function RequestsPage() {
                   {String(req.status || "PENDING")}
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
-                  {String((req.category as any)?.name || req.wasteType || "Unknown")}
+                  {String((req.category as { name?: string } | undefined)?.name || req.wasteType || "Unknown")}
                 </Badge>
               </div>
               <h3 className="font-semibold text-lg line-clamp-1">Request ID: {String(req.id || req._id).slice(0, 8)}</h3>
