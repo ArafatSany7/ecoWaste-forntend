@@ -1,12 +1,12 @@
 import { apiClient } from "./client";
 
 export interface WasteRequestPayload {
-  title: string;
-  description: string;
-  wasteType: "PLASTIC" | "ORGANIC" | "E_WASTE" | "PAPER" | "METAL" | "OTHER";
-  estimatedWeight?: string;
+  categoryId: string;
+  zoneId: string;
   address: string;
-  contactNumber: string;
+  weight?: number;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface WasteRequestResponse {
