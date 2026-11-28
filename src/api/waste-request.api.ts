@@ -1,12 +1,10 @@
 import { apiClient } from "./client";
 
-/** Matches the backend's createWasteRequestSchema. */
 export interface WasteRequestPayload {
   categoryId: string;
   zoneId: string;
   address: string;
   weight?: number;
-  /** Pickup pin. Both or neither. */
   latitude?: number;
   longitude?: number;
 }

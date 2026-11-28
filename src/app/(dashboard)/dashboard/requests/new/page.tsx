@@ -19,7 +19,6 @@ import { wasteCategoryApi } from "@/api/waste-category.api";
 import { zoneApi } from "@/api/zone.api";
 import { formatLatLng, type LatLng } from "@/components/map/map-config";
 
-// MapLibre needs the browser (WebGL, window) — load it client-side only.
 const LocationPicker = dynamic(() => import("@/components/map/LocationPicker"), {
   ssr: false,
   loading: () => <Skeleton className="h-72 w-full rounded-xl sm:h-80" />,
@@ -113,7 +112,6 @@ export default function NewPickupRequestPage() {
       <div className="mx-auto max-w-2xl space-y-6">
         <PageHeader title="Schedule Pickup" description="Tell us what to collect and pin exactly where to find it." />
 
-        {/* Stepper */}
         <ol className="mb-8 flex items-center justify-between">
           {STEPS.map((label, i) => (
             <li key={label} className="flex flex-1 flex-col items-center" aria-current={step === i ? "step" : undefined}>

@@ -6,6 +6,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { Crosshair, Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_CENTER, DEFAULT_ZOOM, MAP_STYLE, PIN_ZOOM, formatLatLng, type LatLng } from "./map-config";
+import { PickupPin } from "./markers";
 
 interface LocationPickerProps {
   value: LatLng | null;
@@ -21,7 +22,6 @@ const GEO_ERRORS: Record<number, string> = {
   3: "Finding your location took too long. Try again, or tap the map.",
 };
 
-/** Map with a draggable pickup pin. Tap/click to place, drag to fine-tune, or use GPS. */
 export default function LocationPicker({ value, onChange, className }: LocationPickerProps) {
   const mapRef = useRef<MapRef>(null);
   const [geo, setGeo] = useState<GeoState>({ kind: "idle" });
@@ -118,19 +118,5 @@ export default function LocationPicker({ value, onChange, className }: LocationP
         </p>
       )}
     </div>
-  );
-}
-
-function PickupPin() {
-  return (
-    <svg width="34" height="44" viewBox="0 0 34 44" aria-label="Pickup location" role="img" className="drop-shadow-md">
-      <path
-        d="M17 43C17 43 32 27.6 32 16.5C32 7.9 25.3 1 17 1C8.7 1 2 7.9 2 16.5C2 27.6 17 43 17 43Z"
-        fill="oklch(0.5 0.15 150)"
-        stroke="white"
-        strokeWidth="2"
-      />
-      <circle cx="17" cy="16.5" r="5.5" fill="white" />
-    </svg>
   );
 }
